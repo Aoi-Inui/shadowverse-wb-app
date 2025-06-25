@@ -1,89 +1,1160 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.9.1/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.9.1/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.9.1/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シャドバWB戦績管理シート - 高度分析版 (完全版)</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        @media print {
+            body { font-size: 12px; }
+            .card { break-inside: avoid; margin-bottom: 16px; }
+            .no-print { display: none; }
+        }
+        body {
+            background: linear-gradient(135deg, #ffeef5 0%, #f0f8ff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 182, 193, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.6);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.5);
+        }
+        .btn-tertiary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+        .btn-tertiary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+        .input-field {
+            border: 2px solid #fce4ec;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .input-field:focus {
+            border-color: #ff9a9e;
+            box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.1);
+            outline: none;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #ffffff 0%, #ffeef5 100%);
+            border-left: 4px solid #ff9a9e;
+        }
+        .advanced-stats-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-left: 4px solid #667eea;
+        }
+        .confidence-interval {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+            border-left: 4px solid #f59e0b;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #fce4ec;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .checkbox-item:hover {
+            background-color: rgba(255, 182, 193, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-button {
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+        }
+        .tab-button.active {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+        }
+        .time-display {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .large-chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .data-table {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .battle-record {
+            border-left: 4px solid #4facfe;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+        }
+        .win-record { border-left-color: #10b981; }
+        .lose-record { border-left-color: #ef4444; }
+        .matchup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .period-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .period-btn.active {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: white;
+            border-color: #ff9a9e;
+        }
+        .significance-indicator {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .significant { background-color: #10b981; color: white; }
+        .not-significant { background-color: #6b7280; color: white; }
+        .tooltip { position: relative; cursor: help; }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        .heatmap-cell {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            padding: 4px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .heatmap-table {
+            display: grid;
+            grid-template-columns: 150px repeat(7, 1fr);
+            gap: 4px;
+            overflow-x: auto;
+            min-width: 800px;
+        }
+        .heatmap-header {
+            font-weight: bold;
+            padding: 8px;
+            text-align: center;
+        }
     </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+</head>
+<body class="min-h-screen p-4">
+    <main class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="card p-6 mb-6">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-chart-line text-pink-400 mr-3"></i>
+                    シャドバWB戦績管理シート - 高度分析版
+                </h1>
+                <p class="text-gray-600">戦績を記録して成長を実感しよう - 統計分析機能強化版</p>
+            </div>
+        </header>
+
+        <!-- Current Status -->
+        <section class="card p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user-crown text-yellow-500 mr-2"></i>
+                現在のステータス
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="myRank" class="block text-sm font-medium text-gray-700 mb-2">現在のランク</label>
+                    <select id="myRank" class="input-field w-full p-3">
+                        <option value="ビギナー">ビギナー</option>
+                        <option value="D">D</option>
+                        <option value="C">C</option>
+                        <option value="B" selected>B</option>
+                        <option value="A">A</option>
+                        <option value="AA">AA</option>
+                        <option value="マスター">マスター</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="myGroup" class="block text-sm font-medium text-gray-700 mb-2">現在のグループ</label>
+                    <select id="myGroup" class="input-field w-full p-3">
+                        <option value="エメラルド">エメラルド (×1.0)</option>
+                        <option value="トパーズ" selected>トパーズ (×1.1)</option>
+                        <option value="ルビー">ルビー (×1.3)</option>
+                        <option value="サファイア">サファイア (×1.5)</option>
+                        <option value="ダイヤモンド">ダイヤモンド (×2.0)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">BP倍率</label>
+                    <div id="bpMultiplier" class="input-field w-full p-3 bg-gray-100 text-center font-bold text-lg">
+                        ×1.1
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Tabs -->
+        <div class="card p-6 mb-6">
+            <nav class="flex border-b border-gray-200 mb-6 no-print overflow-x-auto">
+                <button class="tab-button active px-6 py-3 font-medium whitespace-nowrap" data-tab="record">
+                    <i class="fas fa-plus-circle mr-2"></i>戦績記録
+                </button>
+                <button class="tab-button px-6 py-3 font-medium whitespace-nowrap" data-tab="statistics">
+                    <i class="fas fa-chart-bar mr-2"></i>基本統計
+                </button>
+                <button class="tab-button px-6 py-3 font-medium whitespace-nowrap" data-tab="advanced-analysis">
+                    <i class="fas fa-chart-area mr-2"></i>高度分析
+                </button>
+                <button class="tab-button px-6 py-3 font-medium whitespace-nowrap" data-tab="matchup-analysis">
+                    <i class="fas fa-chess mr-2"></i>対戦分析
+                </button>
+                <button class="tab-button px-6 py-3 font-medium whitespace-nowrap" data-tab="deck-progress">
+                    <i class="fas fa-chart-line mr-2"></i>デッキ別成長
+                </button>
+                <button class="tab-button px-6 py-3 font-medium whitespace-nowrap" data-tab="data">
+                    <i class="fas fa-database mr-2"></i>データ管理
+                </button>
+            </nav>
+
+            <!-- Record Tab -->
+            <section id="record" class="tab-content active">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">新しい戦績を記録</h2>
+                <form id="battleForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="myClass" class="block text-sm font-medium text-gray-700 mb-2">
+                                自分のクラス
+                                <span class="text-xs text-blue-600 ml-1">
+                                    <i class="fas fa-info-circle"></i> 前回の選択を記憶
+                                </span>
+                            </label>
+                            <select id="myClass" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="ロイヤル">ロイヤル</option>
+                                <option value="ウィッチ">ウィッチ</option>
+                                <option value="ドラゴン">ドラゴン</option>
+                                <option value="ナイトメア">ナイトメア</option>
+                                <option value="ビショップ">ビショップ</option>
+                                <option value="エルフ">エルフ</option>
+                                <option value="ネメシス">ネメシス</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="opponentClass" class="block text-sm font-medium text-gray-700 mb-2">相手のクラス</label>
+                            <select id="opponentClass" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="ロイヤル">ロイヤル</option>
+                                <option value="ウィッチ">ウィッチ</option>
+                                <option value="ドラゴン">ドラゴン</option>
+                                <option value="ナイトメア">ナイトメア</option>
+                                <option value="ビショップ">ビショップ</option>
+                                <option value="エルフ">エルフ</option>
+                                <option value="ネメシス">ネメシス</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="result" class="block text-sm font-medium text-gray-700 mb-2">勝敗</label>
+                            <select id="result" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="勝利">勝利</option>
+                                <option value="敗北">敗北</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="firstSecond" class="block text-sm font-medium text-gray-700 mb-2">先攻/後攻</label>
+                            <select id="firstSecond" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="先攻">先攻</option>
+                                <option value="後攻">後攻</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="opponentRank" class="block text-sm font-medium text-gray-700 mb-2">相手のランク</label>
+                            <select id="opponentRank" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="ビギナー">ビギナー</option>
+                                <option value="D">D</option>
+                                <option value="C">C</option>
+                                <option value="B">B</option>
+                                <option value="A">A</option>
+                                <option value="AA">AA</option>
+                                <option value="マスター">マスター</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="opponentGroup" class="block text-sm font-medium text-gray-700 mb-2">相手のグループ</label>
+                            <select id="opponentGroup" class="input-field w-full p-3" required>
+                                <option value="">選択してください</option>
+                                <option value="エメラルド">エメラルド</option>
+                                <option value="トパーズ">トパーズ</option>
+                                <option value="ルビー">ルビー</option>
+                                <option value="サファイア">サファイア</option>
+                                <option value="ダイヤモンド">ダイヤモンド</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="handAccident" class="block text-sm font-medium text-gray-700 mb-2">手札事故</label>
+                            <select id="handAccident" class="input-field w-full p-3">
+                                <option value="なし">なし</option>
+                                <option value="PP事故">PP事故</option>
+                                <option value="フィニッシャー事故">フィニッシャー事故</option>
+                                <option value="マリガン事故">マリガン事故</option>
+                                <option value="ドロー事故">ドロー事故</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="mulliganSuccess" class="block text-sm font-medium text-gray-700 mb-2">マリガン成功率</label>
+                            <select id="mulliganSuccess" class="input-field w-full p-3">
+                                <option value="理想的">理想的</option>
+                                <option value="普通">普通</option>
+                                <option value="失敗">失敗</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="playingMistake" class="block text-sm font-medium text-gray-700 mb-2">プレイングミス</label>
+                            <select id="playingMistake" class="input-field w-full p-3">
+                                <option value="なし">なし</option>
+                                <option value="序盤判断ミス">序盤判断ミス</option>
+                                <option value="中盤判断ミス">中盤判断ミス</option>
+                                <option value="終盤判断ミス">終盤判断ミス</option>
+                                <option value="進化タイミングミス">進化タイミングミス</option>
+                                <option value="リーサル見落とし">リーサル見落とし</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="timeSlot" class="block text-sm font-medium text-gray-700 mb-2">
+                                対戦時間帯
+                                <button type="button" data-action="update-time" class="btn-secondary ml-2 px-2 py-1 text-xs">
+                                    <i class="fas fa-sync-alt mr-1"></i>自動取得
+                                </button>
+                            </label>
+                            <select id="timeSlot" class="input-field w-full p-3">
+                                <option value="朝">朝 (5:00-12:00)</option>
+                                <option value="昼">昼 (12:00-17:00)</option>
+                                <option value="夕方">夕方 (17:00-19:00)</option>
+                                <option value="夜">夜 (19:00-24:00)</option>
+                                <option value="深夜">深夜 (0:00-5:00)</option>
+                            </select>
+                            <div id="currentTimeDisplay" class="time-display"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">勝因 (複数選択可)</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item"><input type="checkbox" id="win1" value="完璧な序盤展開" class="mr-2"><label for="win1" class="text-sm">完璧な序盤展開</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win2" value="中盤優位維持" class="mr-2"><label for="win2" class="text-sm">中盤優位維持</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win3" value="リソース管理成功" class="mr-2"><label for="win3" class="text-sm">リソース管理成功</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win4" value="相手デッキ対策的中" class="mr-2"><label for="win4" class="text-sm">相手デッキ対策的中</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win5" value="最適マリガン" class="mr-2"><label for="win5" class="text-sm">最適マリガン</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win6" value="進化タイミング完璧" class="mr-2"><label for="win6" class="text-sm">進化タイミング完璧</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win7" value="リーサル計算正確" class="mr-2"><label for="win7" class="text-sm">リーサル計算正確</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win8" value="冷静な判断力" class="mr-2"><label for="win8" class="text-sm">冷静な判断力</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win9" value="有利マッチアップ" class="mr-2"><label for="win9" class="text-sm">有利マッチアップ</label></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">敗因 (複数選択可)</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item"><input type="checkbox" id="loss1" value="PP事故（序盤の動き不足）" class="mr-2"><label for="loss1" class="text-sm">PP事故（序盤の動き不足）</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss2" value="フィニッシャー事故" class="mr-2"><label for="loss2" class="text-sm">フィニッシャー事故</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss3" value="手札事故（偏り）" class="mr-2"><label for="loss3" class="text-sm">手札事故（偏り）</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss4" value="ドロー事故" class="mr-2"><label for="loss4" class="text-sm">ドロー事故</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss5" value="マリガン失敗" class="mr-2"><label for="loss5" class="text-sm">マリガン失敗</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss6" value="進化タイミングミス" class="mr-2"><label for="loss6" class="text-sm">進化タイミングミス</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss7" value="リソース管理失敗" class="mr-2"><label for="loss7" class="text-sm">リソース管理失敗</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss8" value="リーサル見落とし" class="mr-2"><label for="loss8" class="text-sm">リーサル見落とし</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss9" value="時間切れ" class="mr-2"><label for="loss9" class="text-sm">時間切れ</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss10" value="相手キーカード対処不能" class="mr-2"><label for="loss10" class="text-sm">相手キーカード対処不能</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss11" value="フィニッシュ力不足" class="mr-2"><label for="loss11" class="text-sm">フィニッシュ力不足</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss12" value="序盤劣勢回復不可" class="mr-2"><label for="loss12" class="text-sm">序盤劣勢回復不可</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss13" value="長期戦で失速" class="mr-2"><label for="loss13" class="text-sm">長期戦で失速</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss14" value="不利マッチアップ" class="mr-2"><label for="loss14" class="text-sm">不利マッチアップ</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="loss15" value="相手格上実力差" class="mr-2"><label for="loss15" class="text-sm">相手格上実力差</label></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="memo" class="block text-sm font-medium text-gray-700 mb-2">メモ</label>
+                        <textarea id="memo" class="input-field w-full p-3 h-24" placeholder="詳細な状況や感想を記録..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-3 text-lg no-print">
+                        <i class="fas fa-save mr-2"></i>戦績を保存
+                    </button>
+                </form>
+            </section>
+
+            <!-- Basic Statistics Tab -->
+            <section id="statistics" class="tab-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">基本統計分析</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">総戦績</p><p class="text-2xl font-bold text-gray-800" id="totalRecord">0勝0敗</p></div><i class="fas fa-trophy text-yellow-500 text-2xl"></i></div></div>
+                    <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">勝率</p><p class="text-2xl font-bold text-gray-800" id="winRate">0%</p></div><i class="fas fa-percentage text-green-500 text-2xl"></i></div></div>
+                    <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">直近20戦</p><p class="text-2xl font-bold text-gray-800" id="recent20">0%</p></div><i class="fas fa-chart-line text-blue-500 text-2xl"></i></div></div>
+                    <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">連勝記録</p><p class="text-2xl font-bold text-gray-800" id="winStreak">0</p></div><i class="fas fa-fire text-red-500 text-2xl"></i></div></div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">先攻後攻別勝率</h3><div id="firstSecondStats" class="space-y-4"><div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-medium">先攻</span><span class="font-bold text-blue-600" id="firstWinRate">0% (0/0)</span></div><div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-medium">後攻</span><span class="font-bold text-red-600" id="secondWinRate">0% (0/0)</span></div></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">環境遭遇率</h3><div id="environmentStats" class="space-y-2"></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">時間帯別成績</h3><div id="timeSlotStats" class="space-y-2"></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">対戦相手分析</h3><div id="opponentAnalysis" class="space-y-2"></div></div>
+                </div>
+                
+                <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">勝率推移</h3><div class="chart-container"><canvas id="winRateChart"></canvas></div></div>
+            </section>
+
+            <!-- Advanced Analysis Tab -->
+            <section id="advanced-analysis" class="tab-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">高度統計分析</h2>
+                
+                <div class="card p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">分析期間選択</h3>
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="all">全期間</button>
+                        <button class="period-btn" data-period="7">直近7日</button>
+                        <button class="period-btn" data-period="30">直近30日</button>
+                        <button class="period-btn" data-period="90">直近90日</button>
+                        <button class="period-btn" data-period="custom">カスタム期間</button>
+                    </div>
+                    <div id="customPeriodInputs" class="mt-4 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">開始日</label><input type="date" id="startDate" class="input-field w-full p-3"></div>
+                            <div><label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">終了日</label><input type="date" id="endDate" class="input-field w-full p-3"></div>
+                        </div>
+                        <button data-action="apply-period" class="btn-secondary mt-4 px-4 py-2">期間を適用</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="advanced-stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600 tooltip" data-tooltip="勝率の95%信頼区間">勝率信頼区間</p><p class="text-lg font-bold text-gray-800" id="confidenceInterval">計算中...</p></div><i class="fas fa-chart-bar text-purple-500 text-xl"></i></div></div>
+                    <div class="advanced-stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600 tooltip" data-tooltip="統計的有意性（p<0.05）">統計的有意性</p><p class="text-lg font-bold text-gray-800" id="statisticalSignificance">計算中...</p></div><i class="fas fa-calculator text-indigo-500 text-xl"></i></div></div>
+                    <div class="advanced-stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600 tooltip" data-tooltip="勝率の標準偏差">勝率安定性</p><p class="text-lg font-bold text-gray-800" id="winRateStability">計算中...</p></div><i class="fas fa-balance-scale text-teal-500 text-xl"></i></div></div>
+                </div>
+
+                <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">時系列パフォーマンス分析</h3><div class="large-chart-container"><canvas id="timeSeriesChart"></canvas></div></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">移動平均勝率</h3><div class="chart-container"><canvas id="movingAverageChart"></canvas></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">勝率分布</h3><div class="chart-container"><canvas id="winRateDistributionChart"></canvas></div></div>
+                </div>
+                <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">連勝・連敗分析</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4"><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連勝</p><p class="text-2xl font-bold text-green-600" id="maxWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連敗</p><p class="text-2xl font-bold text-red-600" id="maxLoseStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連勝長</p><p class="text-2xl font-bold text-blue-600" id="avgWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連敗長</p><p class="text-2xl font-bold text-orange-600" id="avgLoseStreak">0</p></div></div><div class="chart-container"><canvas id="streakChart"></canvas></div></div>
+
+                <!-- NEW SECTION: Playing/Mistake Analysis -->
+                <div id="playing-analysis-section" class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>プレイング・事故分析
+                    </h3>
+                    <p class="text-gray-600 mb-6">あなたのプレイ傾向を分析し、改善点を浮き彫りにします。</p>
+
+                    <!-- Plan 1: Loss Reason Charts -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">敗因の内訳</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div class="chart-container h-64"><canvas id="lossCategoryChart"></canvas></div>
+                            <div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Plan 2: Win Rate Impact Chart -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4>
+                        <div class="chart-container"><canvas id="winRateImpactChart"></canvas></div>
+                    </div>
+
+                    <!-- Plan 3: Weakness Heatmap -->
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
+                        <div id="weaknessHeatmap" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Matchup Analysis Tab -->
+            <section id="matchup-analysis" class="tab-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">対戦分析</h2>
+                <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">マッチアップヒートマップ</h3><div id="matchupHeatmap" class="overflow-x-auto"><div class="grid grid-cols-8 gap-1 min-w-max"></div></div></div>
+                <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">詳細マッチアップ統計</h3><div id="detailedMatchupStats" class="matchup-grid"></div></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">相手ランク別勝率</h3><div class="chart-container"><canvas id="opponentRankChart"></canvas></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">相手グループ別勝率</h3><div class="chart-container"><canvas id="opponentGroupChart"></canvas></div></div>
+                </div>
+                <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">先攻後攻詳細分析</h3><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="chart-container"><canvas id="firstSecondDetailChart"></canvas></div><div class="space-y-4"><div class="advanced-stats-card card p-4"><h4 class="font-bold mb-2">先攻後攻統計</h4><div id="firstSecondDetailStats" class="space-y-2"></div></div></div></div></div>
+            </section>
+
+            <!-- Deck Progress Tab -->
+            <section id="deck-progress" class="tab-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">デッキ別成長分析</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">クラス別勝率</h3><div class="chart-container"><canvas id="classWinRateChart"></canvas></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">使用クラス分布</h3><div class="chart-container"><canvas id="classDistributionChart"></canvas></div></div>
+                </div>
+                <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">クラス別詳細統計</h3><div id="classDetailedStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+                <div class="card p-6 mt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">クラス別成長推移</h3>
+                    <div class="mb-4"><label for="classProgressSelector" class="block text-sm font-medium text-gray-700 mb-2">表示するクラス</label>
+                        <select id="classProgressSelector" class="input-field p-3">
+                            <option value="all">全クラス</option>
+                            <option value="ロイヤル">ロイヤル</option>
+                            <option value="ウィッチ">ウィッチ</option>
+                            <option value="ドラゴン">ドラゴン</option>
+                            <option value="ナイトメア">ナイトメア</option>
+                            <option value="ビショップ">ビショップ</option>
+                            <option value="エルフ">エルフ</option>
+                            <option value="ネメシス">ネメシス</option>
+                        </select>
+                    </div>
+                    <div class="large-chart-container"><canvas id="classProgressChart"></canvas></div>
+                </div>
+            </section>
+
+            <!-- Data Management Tab -->
+            <section id="data" class="tab-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">データ管理</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">データ操作</h3><div class="space-y-4">
+                        <button data-action="export-data" class="btn-secondary w-full py-3 no-print"><i class="fas fa-download mr-2"></i>データをエクスポート</button>
+                        <button data-action="export-advanced-report" class="btn-tertiary w-full py-3 no-print"><i class="fas fa-file-excel mr-2"></i>高度分析レポートをエクスポート</button>
+                        <div><label for="importFile" class="block text-sm font-medium text-gray-700 mb-2">データをインポート</label><input type="file" id="importFile" accept=".json" class="input-field w-full p-3 no-print">
+                        <button data-action="import-data" class="btn-secondary w-full py-2 mt-2 no-print"><i class="fas fa-upload mr-2"></i>インポート実行</button></div>
+                        <button data-action="clear-all-data" class="btn-primary w-full py-3 no-print" style="background: linear-gradient(45deg, #ef4444, #dc2626);"><i class="fas fa-trash mr-2"></i>全データを削除</button>
+                    </div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">戦績一覧</h3><div class="data-table"><div id="battleRecords" class="space-y-2"></div></div></div>
+                </div>
+            </section>
+        </div>
+    </main>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    const ShadowverseApp = {
+        state: {
+            battleData: [],
+            charts: {},
+            currentPeriod: 'all',
+            filteredData: [],
+            classes: ['ロイヤル', 'ウィッチ', 'ドラゴン', 'ナイトメア', 'ビショップ', 'エルフ', 'ネメシス'],
+            classColors: ['#ff9a9e', '#fecfef', '#4facfe', '#00f2fe', '#667eea', '#764ba2', '#f093fb', '#f5576c'],
+            // Define mistake and accident types for analysis
+            mistakeTypes: ['序盤判断ミス', '中盤判断ミス', '終盤判断ミス', '進化タイミングミス', 'リーサル見落とし'],
+            accidentTypes: ['PP事故', 'フィニッシャー事故', 'マリガン事故', 'ドロー事故']
+        },
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
+        init() {
+            this.state.battleData = JSON.parse(localStorage.getItem('shadowverseBattleData')) || [];
+            this.setupEventListeners();
+            this.updateBPMultiplier();
+            this.updateTimeSlot();
+            this.loadLastSelectedClass();
+            this.filterDataByPeriod();
+            this.updateAllAnalysis();
+        },
+
+        setupEventListeners() {
+            document.getElementById('myGroup').addEventListener('change', () => this.updateBPMultiplier());
+            document.getElementById('battleForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
+            document.querySelector('nav').addEventListener('click', (e) => this.handleTabClick(e));
+            document.querySelector('.period-selector').addEventListener('click', (e) => this.handlePeriodClick(e));
+            document.getElementById('classProgressSelector').addEventListener('change', () => this.updateClassProgressChart());
+            document.getElementById('result').addEventListener('change', (e) => this.toggleReasonCheckboxes(e.target.value));
+
+            document.body.addEventListener('click', (e) => {
+                const actionButton = e.target.closest('[data-action]');
+                if (!actionButton) return;
+                const action = actionButton.dataset.action;
+                switch (action) {
+                    case 'update-time': this.updateTimeSlot(); break;
+                    case 'apply-period': this.applyCustomPeriod(); break;
+                    case 'export-data': this.exportData(); break;
+                    case 'export-advanced-report': this.exportAdvancedReport(); break;
+                    case 'import-data': this.importData(); break;
+                    case 'clear-all-data': this.clearAllData(); break;
+                    case 'delete-battle': this.deleteBattle(parseInt(actionButton.dataset.id, 10)); break;
+                }
+            });
+        },
+        
+        toggleReasonCheckboxes(result) {
+            const winCheckboxes = document.querySelectorAll('input[id^="win"]');
+            const lossCheckboxes = document.querySelectorAll('input[id^="loss"]');
+            if (result === '勝利') {
+                winCheckboxes.forEach(cb => cb.disabled = false);
+                lossCheckboxes.forEach(cb => { cb.disabled = true; cb.checked = false; });
+            } else if (result === '敗北') {
+                winCheckboxes.forEach(cb => { cb.disabled = true; cb.checked = false; });
+                lossCheckboxes.forEach(cb => cb.disabled = false);
+            } else {
+                winCheckboxes.forEach(cb => cb.disabled = false);
+                lossCheckboxes.forEach(cb => cb.disabled = false);
+            }
+        },
+
+        handleTabClick(e) {
+            const button = e.target.closest('.tab-button');
+            if (button && !button.classList.contains('active')) {
+                this.switchTab(button.dataset.tab, button);
+            }
+        },
+
+        handlePeriodClick(e) {
+            const button = e.target.closest('.period-btn');
+            if (button && !button.classList.contains('active')) {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                this.state.currentPeriod = button.dataset.period;
+                const customInputs = document.getElementById('customPeriodInputs');
+                if (this.state.currentPeriod === 'custom') {
+                    customInputs.classList.remove('hidden');
+                } else {
+                    customInputs.classList.add('hidden');
+                    this.filterDataByPeriod();
+                    this.updateAllAnalysis();
+                }
+            }
+        },
+
+        handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const battleRecord = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                myClass: document.getElementById('myClass').value,
+                opponentClass: document.getElementById('opponentClass').value,
+                result: document.getElementById('result').value,
+                firstSecond: document.getElementById('firstSecond').value,
+                opponentRank: document.getElementById('opponentRank').value,
+                opponentGroup: document.getElementById('opponentGroup').value,
+                handAccident: document.getElementById('handAccident').value,
+                mulliganSuccess: document.getElementById('mulliganSuccess').value,
+                playingMistake: document.getElementById('playingMistake').value,
+                timeSlot: document.getElementById('timeSlot').value,
+                winReasons: this.getCheckedValues('win'),
+                lossReasons: this.getCheckedValues('loss'),
+                memo: document.getElementById('memo').value
+            };
+            this.state.battleData.push(battleRecord);
+            localStorage.setItem('shadowverseBattleData', JSON.stringify(this.state.battleData));
+            this.saveLastSelectedClass(battleRecord.myClass);
+            form.reset();
+            this.toggleReasonCheckboxes(''); // Reset checkboxes state
+            this.showNotification('戦績を保存しました！', 'success');
+            this.filterDataByPeriod();
+            this.updateAllAnalysis();
+        },
+
+        switchTab(tabName, clickedButton) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            clickedButton.classList.add('active');
+            
+            this.filterDataByPeriod();
+            setTimeout(() => {
+                switch(tabName) {
+                    case 'statistics': this.updateStatistics(); break;
+                    case 'advanced-analysis': this.updateAdvancedAnalysis(); break;
+                    case 'matchup-analysis': this.updateMatchupAnalysis(); break;
+                    case 'deck-progress': this.updateDeckProgress(); break;
+                    case 'data': this.updateDataManagement(); break;
+                }
+            }, 10);
+        },
+        
+        updateAllAnalysis() {
+            this.filterDataByPeriod();
+            const activeTab = document.querySelector('.tab-content.active')?.id || 'record';
+            this.switchTab(activeTab, document.querySelector(`.tab-button[data-tab="${activeTab}"]`));
+        },
+
+        filterDataByPeriod() {
+            const now = new Date();
+            const { battleData, currentPeriod } = this.state;
+            if (currentPeriod === 'all') {
+                this.state.filteredData = [...battleData];
+                return;
+            }
+            if (currentPeriod === 'custom') {
+                const startDateVal = document.getElementById('startDate').value;
+                const endDateVal = document.getElementById('endDate').value;
+                if (!startDateVal || !endDateVal) {
+                    this.state.filteredData = [];
+                    return;
+                }
+                const startDate = new Date(startDateVal);
+                const endDate = new Date(endDateVal);
+                endDate.setHours(23, 59, 59, 999);
+                this.state.filteredData = battleData.filter(b => {
+                    const battleDate = new Date(b.timestamp);
+                    return battleDate >= startDate && battleDate <= endDate;
+                });
+                return;
+            }
+            const days = parseInt(currentPeriod);
+            const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+            this.state.filteredData = battleData.filter(b => new Date(b.timestamp) >= cutoffDate);
+        },
+
+        applyCustomPeriod() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) return this.showNotification('開始日と終了日を選択してください', 'error');
+            this.filterDataByPeriod();
+            this.updateAllAnalysis();
+            this.showNotification('期間を適用しました', 'success');
+        },
+
+        updateBPMultiplier() {
+            const multipliers = { 'エメラルド': '×1.0', 'トパーズ': '×1.1', 'ルビー': '×1.3', 'サファイア': '×1.5', 'ダイヤモンド': '×2.0' };
+            document.getElementById('bpMultiplier').textContent = multipliers[document.getElementById('myGroup').value] || 'N/A';
+        },
+
+        updateTimeSlot() {
+            const now = new Date(), hour = now.getHours();
+            let timeSlot = '深夜';
+            if (hour >= 5 && hour < 12) timeSlot = '朝';
+            else if (hour >= 12 && hour < 17) timeSlot = '昼';
+            else if (hour >= 17 && hour < 19) timeSlot = '夕方';
+            else if (hour >= 19 && hour < 24) timeSlot = '夜';
+            document.getElementById('timeSlot').value = timeSlot;
+            document.getElementById('currentTimeDisplay').textContent = `現在時刻: ${now.toLocaleString('ja-JP')}`;
+        },
+
+        loadLastSelectedClass() { localStorage.getItem('lastSelectedClass') && (document.getElementById('myClass').value = localStorage.getItem('lastSelectedClass')); },
+        saveLastSelectedClass(className) { localStorage.setItem('lastSelectedClass', className); },
+        getCheckedValues(prefix) { return Array.from(document.querySelectorAll(`input[id^="${prefix}"]:checked`)).map(cb => cb.value); },
+        
+        createChart(canvasId, type, data, options) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            if (this.state.charts[canvasId]) this.state.charts[canvasId].destroy();
+            this.state.charts[canvasId] = new Chart(ctx, { type, data, options });
+        },
+
+        prepareChartContainer(canvasId, requiredLength, actualLength, message) {
+            const container = document.getElementById(canvasId)?.parentElement;
+            if (!container) return false;
+
+            if (actualLength < requiredLength) {
+                container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-500 p-4 text-center">${message}</div>`;
+                return false;
+            }
+
+            if (!container.querySelector('canvas')) {
+                container.innerHTML = `<canvas id="${canvasId}"></canvas>`;
+            }
+            return true;
+        },
+
+        calculateConfidenceInterval(wins, total) {
+            if (total === 0) return { lower: 0, upper: 0 };
+            const p = wins / total, z = 1.96, margin = z * Math.sqrt((p * (1 - p)) / total);
+            return { lower: Math.max(0, p - margin), upper: Math.min(1, p + margin) };
+        },
+        calculateStatisticalSignificance(wins, total) {
+            if (total < 30) return { significant: false, pValue: null };
+            const p = wins / total, z = (p - 0.5) / Math.sqrt((0.5 * 0.5) / total), pValue = 2 * (1 - this.normalCDF(Math.abs(z)));
+            return { significant: pValue < 0.05, pValue };
+        },
+        normalCDF(x) { return 0.5 * (1 + this.erf(x / Math.sqrt(2))); },
+        erf(x) {
+            const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p=0.3275911;
+            const sign = x < 0 ? -1 : 1; x = Math.abs(x); const t = 1.0/(1.0+p*x);
+            return sign * (1.0 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
+        },
+        calculateWinRateStability(data) {
+            if (data.length < 10) return 0;
+            const rates = [], wSize = Math.max(10, Math.floor(data.length / 5));
+            for (let i = wSize; i <= data.length; i++) rates.push(data.slice(i-wSize, i).filter(b=>b.result==='勝利').length/wSize*100);
+            if (rates.length < 2) return 0;
+            const mean = rates.reduce((a,b)=>a+b,0)/rates.length, variance = rates.reduce((s,r)=>s+Math.pow(r-mean,2),0)/rates.length;
+            return Math.sqrt(variance);
+        },
+        calculateStreaks(data) {
+            if (data.length === 0) return { maxWin: 0, maxLose: 0, avgWin: 0, avgLose: 0, winStreaks: [], loseStreaks: [] };
+            let win = [], lose = [], current = 0, type = null;
+            data.forEach(b => {
+                const t = b.result === '勝利' ? 'win' : 'lose';
+                if (t === type) current++; else { if(type==='win') win.push(current); if(type==='lose') lose.push(current); type = t; current = 1; }
+            });
+            if(type==='win') win.push(current); if(type==='lose') lose.push(current);
+            return { maxWin: win.length?Math.max(...win):0, maxLose: lose.length?Math.max(...lose):0, avgWin: win.length?win.reduce((a,b)=>a+b,0)/win.length:0, avgLose: lose.length?lose.reduce((a,b)=>a+b,0)/lose.length:0, winStreaks: win, loseStreaks: lose };
+        },
+        calculateFirstSecondSignificance(w1,t1,w2,t2) {
+            if (t1<10||t2<10) return {significant:false}; const p1=w1/t1,p2=w2/t2,pp=(w1+w2)/(t1+t2),se=Math.sqrt(pp*(1-pp)*(1/t1+1/t2)),z=Math.abs(p1-p2)/se;
+            return {significant:2*(1-this.normalCDF(z))<0.05};
+        },
+
+        updateStatistics() {
+            const d = this.state.filteredData, w = d.filter(b=>b.result==='勝利').length, r20 = d.slice(-20); let s=0; for(let i=d.length-1;i>=0;i--){if(d[i].result==='勝利')s++;else break;}
+            document.getElementById('totalRecord').textContent=`${w}勝${d.length-w}敗`; document.getElementById('winRate').textContent=d.length>0?`${Math.round(w/d.length*100)}%`:'0%'; document.getElementById('recent20').textContent=r20.length>0?`${Math.round(r20.filter(b=>b.result==='勝利').length/r20.length*100)}%`:'0%'; document.getElementById('winStreak').textContent=s;
+            this.updateFirstSecondStats(); this.updateEnvironmentStats(); this.updateTimeSlotStats(); this.updateOpponentAnalysis(); this.updateWinRateChart();
+        },
+        
+        updateAdvancedAnalysis() {
+            const d = this.state.filteredData;
+            if(d.length > 0) {
+                const w = d.filter(b=>b.result==='勝利').length; 
+                const ci=this.calculateConfidenceInterval(w,d.length); 
+                document.getElementById('confidenceInterval').textContent=`${Math.round(ci.lower*100)}% - ${Math.round(ci.upper*100)}%`; 
+                const sig=this.calculateStatisticalSignificance(w,d.length); 
+                const sigEl=document.getElementById('statisticalSignificance'); 
+                if(sig.pValue!==null) sigEl.innerHTML=`<span class="significance-indicator ${sig.significant?'significant':'not-significant'}">${sig.significant?'有意':'非有意'} (p=${sig.pValue.toFixed(3)})</span>`;
+                else sigEl.textContent='サンプル不足'; 
+                document.getElementById('winRateStability').textContent=`${this.calculateWinRateStability(d).toFixed(2)}%`;
+            } else {
+                document.getElementById('confidenceInterval').textContent='データなし';
+                document.getElementById('statisticalSignificance').textContent='データなし';
+                document.getElementById('winRateStability').textContent='データなし';
+            }
+            this.updateTimeSeriesChart(); 
+            this.updateMovingAverageChart(); 
+            this.updateWinRateDistributionChart(); 
+            this.updateStreakAnalysis();
+            this.updatePlayingAnalysis(); // NEW: Call playing analysis update
+        },
+
+        updateMatchupAnalysis() { this.updateMatchupHeatmap(); this.updateDetailedMatchupStats(); this.updateOpponentRankChart(); this.updateOpponentGroupChart(); this.updateFirstSecondDetailChart(); },
+        updateDeckProgress() { this.updateClassWinRateChart(); this.updateClassDistributionChart(); this.updateClassDetailedStats(); this.updateClassProgressChart(); },
+        updateDataManagement() {
+            const html = this.state.battleData.slice().reverse().map(b => `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}"><div class="flex justify-between items-start mb-2"><div class="flex items-center space-x-4"><span class="font-bold ${b.result==='勝利'?'text-green-600':'text-red-600'}">${b.result}</span><span class="text-sm text-gray-600">${new Date(b.timestamp).toLocaleString('ja-JP')}</span></div><button data-action="delete-battle" data-id="${b.id}" class="text-red-500 no-print"><i class="fas fa-trash"></i></button></div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm"><div><strong>自分:</strong> ${b.myClass}</div><div><strong>相手:</strong> ${b.opponentClass}</div><div><strong>先攻後攻:</strong> ${b.firstSecond}</div><div><strong>時間帯:</strong> ${b.timeSlot}</div></div>${b.memo?`<div class="mt-2 text-sm text-gray-600"><strong>メモ:</strong> ${b.memo}</div>`:''}</div>`).join('');
+            document.getElementById('battleRecords').innerHTML = html || '<p class="text-gray-500 text-center">戦績データがありません</p>';
+        },
+
+        updateFirstSecondStats() {
+            const d=this.state.filteredData,f=d.filter(b=>b.firstSecond==='先攻'),s=d.filter(b=>b.firstSecond==='後攻'),fw=f.filter(b=>b.result==='勝利').length,sw=s.filter(b=>b.result==='勝利').length;
+            document.getElementById('firstWinRate').textContent=`${f.length>0?Math.round(fw/f.length*100):0}% (${fw}/${f.length})`; document.getElementById('secondWinRate').textContent=`${s.length>0?Math.round(sw/s.length*100):0}% (${sw}/${s.length})`;
+        },
+        updateEnvironmentStats(){const d=this.state.filteredData,c={},t=d.length;d.forEach(b=>c[b.opponentClass]=(c[b.opponentClass]||0)+1);document.getElementById('environmentStats').innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div class="flex justify-between p-2 bg-gray-50 rounded"><span class="font-medium">${n}</span><span class="text-sm text-gray-600">${t>0?Math.round(v/t*100):0}% (${v}/${t})</span></div>`).join('');},
+        updateTimeSlotStats(){const d=this.state.filteredData,s={};d.forEach(b=>{if(!s[b.timeSlot])s[b.timeSlot]={w:0,t:0};s[b.timeSlot].t++;if(b.result==='勝利')s[b.timeSlot].w++;});document.getElementById('timeSlotStats').innerHTML=Object.entries(s).map(([n,v])=>`<div class="flex justify-between p-2 bg-gray-50 rounded"><span class="font-medium">${n}</span><span class="text-sm text-gray-600">${v.t>0?Math.round(v.w/v.t*100):0}% (${v.w}/${v.t})</span></div>`).join('');},
+        updateOpponentAnalysis(){const d=this.state.filteredData,r={};d.forEach(b=>{if(!r[b.opponentRank])r[b.opponentRank]={w:0,t:0};r[b.opponentRank].t++;if(b.result==='勝利')r[b.opponentRank].w++;});document.getElementById('opponentAnalysis').innerHTML=Object.entries(r).map(([n,v])=>`<div class="flex justify-between p-2 bg-gray-50 rounded"><span class="font-medium">${n}ランク</span><span class="text-sm text-gray-600">${v.t>0?Math.round(v.w/v.t*100):0}% (${v.w}/${v.t})</span></div>`).join('');},
+
+        updateWinRateChart() {
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('winRateChart', 1, d.length, '戦績を記録すると勝率推移が表示されます。')) return;
+            const d30 = d.slice(-30), l=[], r=[];
+            for(let i=1;i<=d30.length;i++){l.push(`${d.length - d30.length + i}戦目`);r.push(Math.round(d.slice(0, d.length - d30.length + i).filter(b=>b.result==='勝利').length/(d.length - d30.length + i)*100));}
+            this.createChart('winRateChart','line',{labels:l,datasets:[{label:'勝率推移 (直近30戦)',data:r,borderColor:'#ff9a9e',tension:0.4}]},{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:100}}});
+        },
+        updateTimeSeriesChart() {
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('timeSeriesChart', 1, d.length, '戦績を記録すると時系列分析が表示されます。')) return;
+            const s={};d.forEach(b=>{const dt=new Date(b.timestamp).toDateString();if(!s[dt])s[dt]={w:0,t:0};s[dt].t++;if(b.result==='勝利')s[dt].w++;});const o=Object.keys(s).sort((a,b)=>new Date(a)-new Date(b));
+            this.createChart('timeSeriesChart','line',{labels:o,datasets:[{label:'日別勝率',data:o.map(dt=>Math.round(s[dt].w/s[dt].t*100)),borderColor:'#ff9a9e',yAxisID:'y'},{label:'日別対戦数',data:o.map(dt=>s[dt].t),borderColor:'#4facfe',yAxisID:'y1'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',max:100},y1:{position:'right',grid:{drawOnChartArea:false}}}});
+        },
+        updateMovingAverageChart() {
+            const d=this.state.filteredData, required = 10;
+            if (!this.prepareChartContainer('movingAverageChart', required, d.length, `データが${required}件以上あると移動平均が表示されます。`)) return;
+            const ds=[5,10,20].map((w,i)=>{if(d.length<w)return null;const a=[];for(let j=w;j<=d.length;j++)a.push(Math.round(d.slice(j-w,j).filter(b=>b.result==='勝利').length/w*100));return{label:`${w}戦移動平均`,data:a,borderColor:['#ff9a9e','#4facfe','#667eea'][i],tension:0.4};}).filter(d=>d);this.createChart('movingAverageChart','line',{labels:Array.from({length:d.length-4},(_,i)=>`${i+5}戦目`),datasets:ds},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});
+        },
+        updateWinRateDistributionChart() {
+            const d=this.state.filteredData, required = 20;
+            if (!this.prepareChartContainer('winRateDistributionChart', required, d.length, `データが${required}件以上あると勝率分布が表示されます。`)) return;
+            const r=[];for(let i=10;i<=d.length;i++)r.push(Math.round(d.slice(i-10,i).filter(b=>b.result==='勝利').length/10*100));const b=Array(10).fill(0);r.forEach(v=>{const i=Math.floor(v/10);b[i===10?9:i]++;});this.createChart('winRateDistributionChart','bar',{labels:Array.from({length:10},(_,i)=>`${i*10}-${i*10+9}%`),datasets:[{label:'頻度',data:b,backgroundColor:'#ff9a9e'}]},{responsive:true,maintainAspectRatio:false});
+        },
+        updateStreakAnalysis(){
+            const d=this.state.filteredData;
+            const s=this.calculateStreaks(d);document.getElementById('maxWinStreak').textContent=s.maxWin;document.getElementById('maxLoseStreak').textContent=s.maxLose;document.getElementById('avgWinStreak').textContent=s.avgWin.toFixed(1);document.getElementById('avgLoseStreak').textContent=s.avgLose.toFixed(1);
+            if (!this.prepareChartContainer('streakChart', 1, d.length, '戦績を記録すると連勝・連敗分析が表示されます。')) return;
+            const m=Math.max(s.maxWin,s.maxLose),l=Array.from({length:m},(_,i)=>`${i+1}連`),wc=Array(m).fill(0),lc=Array(m).fill(0);s.winStreaks.forEach(v=>wc[v-1]++);s.loseStreaks.forEach(v=>lc[v-1]++);this.createChart('streakChart','bar',{labels:l,datasets:[{label:'連勝回数',data:wc,backgroundColor:'#10b981'},{label:'連敗回数',data:lc,backgroundColor:'#ef4444'}]},{responsive:true,maintainAspectRatio:false});
+        },
+        updateMatchupHeatmap(){const d=this.state.filteredData,c=this.state.classes,m={};c.forEach(mc=>{m[mc]={};c.forEach(oc=>m[mc][oc]={w:0,t:0});});d.forEach(b=>{if(m[b.myClass]?.[b.opponentClass]){m[b.myClass][b.opponentClass].t++;if(b.result==='勝利')m[b.myClass][b.opponentClass].w++;}});const gc=(r,t)=>{if(t===0)return'#f3f4f6';const a=Math.min(1,t/10);if(r>=60)return`rgba(16,185,129,${a})`;if(r>=50)return`rgba(59,130,246,${a})`;if(r>=40)return`rgba(245,158,11,${a})`;return`rgba(239,68,68,${a})`;};let h='<div class="grid grid-cols-8 gap-1 min-w-max"><div></div>';c.forEach(cn=>h+=`<div class="p-2 font-bold text-center text-sm">${cn}</div>`);c.forEach(mc=>{h+=`<div class="p-2 font-bold text-center text-sm">${mc}</div>`;c.forEach(oc=>{const s=m[mc][oc],r=s.t>0?Math.round(s.w/s.t*100):0;h+=`<div class="heatmap-cell" style="background-color:${gc(r,s.t)}">${s.t>0?`${r}%<br><span class="text-xs">(${s.w}/${s.t})</span>`:'-'}</div>`;});});document.getElementById('matchupHeatmap').innerHTML=h+'</div>';},
+        updateDetailedMatchupStats(){const d=this.state.filteredData,c=this.state.classes,ms={};c.forEach(mc=>{const cd=d.filter(b=>b.myClass===mc);if(cd.length===0)return;const w=cd.filter(b=>b.result==='勝利').length,o={};cd.forEach(b=>{if(!o[b.opponentClass])o[b.opponentClass]={w:0,t:0};o[b.opponentClass].t++;if(b.result==='勝利')o[b.opponentClass].w++;});ms[mc]={t:cd.length,w:w,o:o};});let h='';Object.entries(ms).forEach(([n,s])=>{const ci=this.calculateConfidenceInterval(s.w,s.t);h+=`<div class="card p-4"><h4 class="font-bold text-lg mb-3">${n}</h4><div class="space-y-2"><div class="flex justify-between"><span>総戦績:</span><span class="font-bold">${s.w}勝${s.t-s.w}敗</span></div><div class="flex justify-between"><span>勝率:</span><span class="font-bold text-green-600">${s.t>0?Math.round(s.w/s.t*100):0}%</span></div><div class="flex justify-between"><span>信頼区間:</span><span class="text-xs text-gray-600">${Math.round(ci.lower*100)}%-${Math.round(ci.upper*100)}%</span></div><div class="mt-3"><h5 class="font-semibold text-sm mb-2">対戦相手別:</h5><div class="space-y-1">${Object.entries(s.o).map(([on,os])=>`<div class="flex justify-between text-xs"><span>vs ${on}:</span><span>${os.t>0?Math.round(os.w/os.t*100):0}% (${os.w}/${os.t})</span></div>`).join('')}</div></div></div></div>`;});document.getElementById('detailedMatchupStats').innerHTML=h;},
+        updateOpponentRankChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('opponentRankChart', 1, d.length, '戦績を記録すると相手ランク別勝率が表示されます。')) return;
+            const rs={};d.forEach(b=>{if(!rs[b.opponentRank])rs[b.opponentRank]={w:0,t:0};rs[b.opponentRank].t++;if(b.result==='勝利')rs[b.opponentRank].w++;});const l=Object.keys(rs);this.createChart('opponentRankChart','bar',{labels:l,datasets:[{label:'勝率',data:l.map(rn=>rs[rn].t>0?Math.round(rs[rn].w/rs[rn].t*100):0),backgroundColor:'#ff9a9e',yAxisID:'y'},{label:'対戦数',data:l.map(rn=>rs[rn].t),backgroundColor:'#4facfe',yAxisID:'y1'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{position:'left',max:100},y1:{position:'right',grid:{drawOnChartArea:false}}}});
+        },
+        updateOpponentGroupChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('opponentGroupChart', 1, d.length, '戦績を記録すると相手グループ別勝率が表示されます。')) return;
+            const gs={};d.forEach(b=>{if(!gs[b.opponentGroup])gs[b.opponentGroup]={w:0,t:0};gs[b.opponentGroup].t++;if(b.result==='勝利')gs[b.opponentGroup].w++;});const l=Object.keys(gs);this.createChart('opponentGroupChart','doughnut',{labels:l.map(n=>`${n} (${gs[n].t > 0 ? Math.round(gs[n].w/gs[n].t*100) : 0}%)`),datasets:[{data:l.map(n=>gs[n].t),backgroundColor:this.state.classColors}]},{responsive:true,maintainAspectRatio:false});
+        },
+        updateFirstSecondDetailChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('firstSecondDetailChart', 1, d.length, '戦績を記録すると先攻後攻詳細分析が表示されます。')) return;
+            const c=this.state.classes,fs={},ss={};c.forEach(cn=>{const f=d.filter(b=>b.myClass===cn&&b.firstSecond==='先攻'),s=d.filter(b=>b.myClass===cn&&b.firstSecond==='後攻');fs[cn]=f.length>0?Math.round(f.filter(b=>b.result==='勝利').length/f.length*100):0;ss[cn]=s.length>0?Math.round(s.filter(b=>b.result==='勝利').length/s.length*100):0;});this.createChart('firstSecondDetailChart','bar',{labels:c,datasets:[{label:'先攻勝率',data:c.map(cn=>fs[cn]),backgroundColor:'#4facfe'},{label:'後攻勝率',data:c.map(cn=>ss[cn]),backgroundColor:'#ff9a9e'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});this.updateFirstSecondDetailStats();
+        },
+        updateFirstSecondDetailStats(){const d=this.state.filteredData,f=d.filter(b=>b.firstSecond==='先攻'),s=d.filter(b=>b.firstSecond==='後攻'),fw=f.filter(b=>b.result==='勝利').length,sw=s.filter(b=>b.result==='勝利').length,fci=this.calculateConfidenceInterval(fw,f.length),sci=this.calculateConfidenceInterval(sw,s.length),sig=this.calculateFirstSecondSignificance(fw,f.length,sw,s.length);document.getElementById('firstSecondDetailStats').innerHTML=`<div class="space-y-3"><div class="flex justify-between"><span>先攻勝率:</span><span class="font-bold text-blue-600">${f.length>0?Math.round(fw/f.length*100):0}% (${fw}/${f.length})</span></div><div class="flex justify-between"><span>後攻勝率:</span><span class="font-bold text-red-600">${s.length>0?Math.round(sw/s.length*100):0}% (${sw}/${s.length})</span></div><div class="flex justify-between"><span>先攻信頼区間:</span><span class="text-sm text-gray-600">${Math.round(fci.lower*100)}%-${Math.round(fci.upper*100)}%</span></div><div class="flex justify-between"><span>後攻信頼区間:</span><span class="text-sm text-gray-600">${Math.round(sci.lower*100)}%-${Math.round(sci.upper*100)}%</span></div><div class="flex justify-between"><span>差の有意性:</span><span class="significance-indicator ${sig.significant?'significant':'not-significant'}">${sig.significant?'有意差あり':'有意差なし'}</span></div></div>`;},
+        updateClassWinRateChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('classWinRateChart', 1, d.length, '戦績を記録するとクラス別勝率が表示されます。')) return;
+            const cs={};d.forEach(b=>{if(!cs[b.myClass])cs[b.myClass]={w:0,t:0};cs[b.myClass].t++;if(b.result==='勝利')cs[b.myClass].w++;});const l=Object.keys(cs);this.createChart('classWinRateChart','bar',{labels:l,datasets:[{label:'勝率',data:l.map(n=>cs[n].t>0?Math.round(cs[n].w/cs[n].t*100):0),backgroundColor:this.state.classColors}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});
+        },
+        updateClassDistributionChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('classDistributionChart', 1, d.length, '戦績を記録すると使用クラス分布が表示されます。')) return;
+            const c={};d.forEach(b=>c[b.myClass]=(c[b.myClass]||0)+1);this.createChart('classDistributionChart','doughnut',{labels:Object.keys(c),datasets:[{data:Object.values(c),backgroundColor:this.state.classColors}]},{responsive:true,maintainAspectRatio:false});
+        },
+        updateClassDetailedStats(){const d=this.state.filteredData,cs={};d.forEach(b=>{if(!cs[b.myClass])cs[b.myClass]={w:0,t:0};cs[b.myClass].t++;if(b.result==='勝利')cs[b.myClass].w++;});document.getElementById('classDetailedStats').innerHTML=Object.entries(cs).map(([n,s])=>{const ci=this.calculateConfidenceInterval(s.w,s.t);return`<div class="stats-card card p-4"><h4 class="font-bold text-lg mb-2">${n}</h4><div class="space-y-2"><div class="flex justify-between"><span>戦績:</span><span class="font-bold">${s.w}勝${s.t-s.w}敗</span></div><div class="flex justify-between"><span>勝率:</span><span class="font-bold text-green-600">${s.t>0?Math.round(s.w/s.t*100):0}%</span></div><div class="flex justify-between"><span>信頼区間:</span><span class="text-xs text-gray-600">${Math.round(ci.lower*100)}%-${Math.round(ci.upper*100)}%</span></div></div></div>`;}).join('');},
+        updateClassProgressChart(){
+            const sc=document.getElementById('classProgressSelector').value;
+            const d = this.state.filteredData.filter(b => sc === 'all' || b.myClass === sc);
+            const required = 5;
+            if (!this.prepareChartContainer('classProgressChart', required, d.length, `選択したクラスで${required}戦以上記録すると、成長推移が表示されます。`)) return;
+
+            if(sc==='all')this.updateAllClassProgress();else this.updateSingleClassProgress(sc);
+        },
+        updateAllClassProgress(){const d=this.state.filteredData,c=this.state.classes,ds=c.map((cn,i)=>{const cd=d.filter(b=>b.myClass===cn);if(cd.length<5)return null;const r=[];for(let j=5;j<=cd.length;j+=5)r.push(Math.round(cd.slice(0,j).filter(b=>b.result==='勝利').length/j*100));return{label:cn,data:r,borderColor:this.state.classColors[i],tension:0.4};}).filter(d=>d);this.createChart('classProgressChart','line',{labels:ds.length > 0 ? ds[0]?.data.map((_,i)=>`${(i+1)*5}戦`)||[] : [],datasets:ds},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
+        updateSingleClassProgress(cn){const cd=this.state.filteredData.filter(b=>b.myClass===cn);if(cd.length===0)return;const l=[],r=[],cu=[],cl=[];for(let i=1;i<=cd.length;i++){const w=cd.slice(0,i),wn=w.filter(b=>b.result==='勝利').length,ci=this.calculateConfidenceInterval(wn,i);l.push(`${i}戦目`);r.push(wn/i*100);cu.push(ci.upper*100);cl.push(ci.lower*100);}this.createChart('classProgressChart','line',{labels:l,datasets:[{label:'勝率',data:r,borderColor:'#ff9a9e'},{label:'信頼区間',data:cu,borderColor:'#ff9a9e80',borderDash:[5,5],fill:false},{data:cl,borderColor:'#ff9a9e80',borderDash:[5,5],fill:'-1'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
+
+        // ** NEW **: Playing/Mistake Analysis functions
+        updatePlayingAnalysis() {
+            const losses = this.state.filteredData.filter(b => b.result === '敗北');
+            const requiredLosses = 5;
+            if (losses.length < requiredLosses) {
+                document.getElementById('playing-analysis-section').innerHTML = `<div class="text-center text-gray-500 p-8">敗北データを${requiredLosses}件以上記録すると、プレイング・事故分析が表示されます。</div>`;
+                return;
+            } else {
+                 // Restore the section content if it was replaced by the message
+                const section = document.getElementById('playing-analysis-section');
+                if (!section.querySelector('canvas')) {
+                    section.innerHTML = `
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>プレイング・事故分析
+                    </h3>
+                    <p class="text-gray-600 mb-6">あなたのプレイ傾向を分析し、改善点を浮き彫りにします。</p>
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">敗因の内訳</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div class="chart-container h-64"><canvas id="lossCategoryChart"></canvas></div>
+                            <div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4>
+                        <div class="chart-container"><canvas id="winRateImpactChart"></canvas></div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
+                        <div id="weaknessHeatmap" class="overflow-x-auto"></div>
+                    </div>`;
+                }
+            }
+            
+            this.updateLossReasonCharts(losses);
+            this.updateWinRateImpactChart();
+            this.updateWeaknessHeatmap();
+        },
+
+        updateLossReasonCharts(losses) {
+            let mistakeLosses = 0, accidentLosses = 0, otherLosses = 0;
+            const mistakeCounts = {}, accidentCounts = {};
+
+            losses.forEach(b => {
+                let isMistake = b.playingMistake !== 'なし';
+                let isAccident = b.handAccident !== 'なし';
+                
+                if (isMistake) {
+                    mistakeLosses++;
+                    mistakeCounts[b.playingMistake] = (mistakeCounts[b.playingMistake] || 0) + 1;
+                }
+                if (isAccident) {
+                    // Avoid double counting if a loss has both
+                    if (!isMistake) accidentLosses++;
+                    accidentCounts[b.handAccident] = (accidentCounts[b.handAccident] || 0) + 1;
+                }
+                if (!isMistake && !isAccident) {
+                    otherLosses++;
+                }
+            });
+
+            // Plan 1-1: Loss Category Chart
+            this.createChart('lossCategoryChart', 'doughnut', {
+                labels: ['プレミ', '手札事故', 'その他'],
+                datasets: [{ data: [mistakeLosses, accidentLosses, otherLosses], backgroundColor: ['#ef4444', '#f97316', '#6b7280'] }]
+            }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } });
+
+            // Plan 1-2: Loss Detail Chart
+            const sortedMistakes = Object.entries(mistakeCounts).sort((a,b) => b[1] - a[1]);
+            const sortedAccidents = Object.entries(accidentCounts).sort((a,b) => b[1] - a[1]);
+            
+            this.createChart('lossDetailChart', 'bar', {
+                labels: [...sortedMistakes.map(m => m[0]), ...sortedAccidents.map(a => a[0])],
+                datasets: [{
+                    label: '敗因詳細',
+                    data: [...sortedMistakes.map(m => m[1]), ...sortedAccidents.map(a => a[1])],
+                    backgroundColor: [...sortedMistakes.map(() => '#ef4444'), ...sortedAccidents.map(() => '#f97316')]
+                }]
+            }, { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } });
+        },
+
+        updateWinRateImpactChart() {
+            const d = this.state.filteredData;
+            const cleanGames = d.filter(b => b.playingMistake === 'なし' && b.handAccident === 'なし');
+            const problemGames = d.filter(b => b.playingMistake !== 'なし' || b.handAccident !== 'なし');
+
+            const cleanWinRate = cleanGames.length > 0 ? Math.round(cleanGames.filter(b => b.result === '勝利').length / cleanGames.length * 100) : 0;
+            const problemWinRate = problemGames.length > 0 ? Math.round(problemGames.filter(b => b.result === '勝利').length / problemGames.length * 100) : 0;
+
+            this.createChart('winRateImpactChart', 'bar', {
+                labels: [`プレミ/事故なし (${cleanGames.length}戦)`, `プレミ/事故あり (${problemGames.length}戦)`],
+                datasets: [{
+                    label: '勝率',
+                    data: [cleanWinRate, problemWinRate],
+                    backgroundColor: ['#10b981', '#f59e0b']
+                }]
+            }, { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100, beginAtZero: true } }, plugins: { legend: { display: false } } });
+        },
+
+        updateWeaknessHeatmap() {
+            const { classes, mistakeTypes, accidentTypes } = this.state;
+            const allWeaknesses = [...mistakeTypes, ...accidentTypes];
+            const heatmapData = {};
+            allWeaknesses.forEach(w => {
+                heatmapData[w] = {};
+                classes.forEach(c => heatmapData[w][c] = 0);
+            });
+
+            this.state.filteredData.forEach(b => {
+                if (b.playingMistake !== 'なし') {
+                    heatmapData[b.playingMistake][b.opponentClass]++;
+                }
+                if (b.handAccident !== 'なし') {
+                    heatmapData[b.handAccident][b.opponentClass]++;
+                }
+            });
+
+            const container = document.getElementById('weaknessHeatmap');
+            let html = '<div class="heatmap-table">';
+            // Header
+            html += '<div class="heatmap-header"></div>';
+            classes.forEach(c => html += `<div class="heatmap-header">${c}</div>`);
+            
+            // Rows
+            allWeaknesses.forEach(w => {
+                html += `<div class="heatmap-header self-center">${w}</div>`;
+                classes.forEach(c => {
+                    const count = heatmapData[w][c];
+                    const alpha = count > 0 ? Math.min(1, 0.2 + count / 5) : 0;
+                    const bgColor = alpha > 0 ? `rgba(239, 68, 68, ${alpha})` : '#f3f4f6';
+                    html += `<div class="heatmap-cell" style="background-color: ${bgColor}; color: ${alpha > 0.5 ? 'white' : 'black'}">${count > 0 ? count : '-'}</div>`;
+                });
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        },
+
+
+        deleteBattle(id) {if(confirm('この戦績を削除しますか？')){this.state.battleData=this.state.battleData.filter(b=>b.id!==id);localStorage.setItem('shadowverseBattleData',JSON.stringify(this.state.battleData));this.updateAllAnalysis();this.showNotification('戦績を削除しました','success');}},
+        exportData() {const s=JSON.stringify(this.state.battleData,null,2),b=new Blob([s],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`sdb_data_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(u);this.showNotification('データをエクスポートしました','success');},
+        exportAdvancedReport(){/* This function is complex and can be added later if needed */ this.showNotification('この機能は現在準備中です', 'info');},
+        importData() {const f=document.getElementById('importFile').files[0];if(!f)return this.showNotification('ファイルを選択してください','error');const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(Array.isArray(d)){this.state.battleData=d;localStorage.setItem('shadowverseBattleData',JSON.stringify(d));this.updateAllAnalysis();this.showNotification('データをインポートしました','success');}else throw new Error();}catch{this.showNotification('無効なデータ形式です','error');}};r.readAsText(f);},
+        clearAllData() {if(confirm('全てのデータを削除しますか？')){this.state.battleData=[];localStorage.removeItem('shadowverseBattleData');this.updateAllAnalysis();this.showNotification('全データを削除しました','success');}},
+        showNotification(m,t){const e=document.createElement('div');e.className=`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${t==='success'?'bg-green-500':(t==='error'?'bg-red-500':'bg-blue-500')} text-white fade-in`;e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3000);}
+    };
+    document.addEventListener('DOMContentLoaded', () => ShadowverseApp.init());
     </script>
-  </body>
+</body>
 </html>
