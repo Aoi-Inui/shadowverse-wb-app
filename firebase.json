@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "Aoi-Inui/shadowverse-wb-app",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
