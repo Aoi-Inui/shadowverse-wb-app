@@ -564,13 +564,11 @@
             <section id="statistics" class="tab-content">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">基本統計分析</h2>
                 
-                <!-- ★★★ 変更点 ★★★ grid-cols-5 に変更 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                     <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">総戦績</p><p class="text-2xl font-bold text-gray-800" id="totalRecord">0勝0敗</p></div><i class="fas fa-trophy text-yellow-500 text-2xl"></i></div></div>
                     <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">勝率</p><p class="text-2xl font-bold text-gray-800" id="winRate">0%</p></div><i class="fas fa-percentage text-green-500 text-2xl"></i></div></div>
                     <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">直近20戦</p><p class="text-2xl font-bold text-gray-800" id="recent20">0%</p></div><i class="fas fa-chart-line text-blue-500 text-2xl"></i></div></div>
                     <div class="stats-card card p-4"><div class="flex items-center justify-between"><div><p class="text-sm text-gray-600">連勝記録</p><p class="text-2xl font-bold text-gray-800" id="winStreak">0</p></div><i class="fas fa-fire text-red-500 text-2xl"></i></div></div>
-                    <!-- ★★★ 変更点 ★★★ 今日の戦績カードを追加 -->
                     <div class="stats-card card p-4">
                         <div class="flex items-center justify-between">
                             <div>
@@ -673,6 +671,10 @@
                     </div>
                     <div class="mt-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
+                        <!-- ★★★ 変更点 ★★★ 弱点レポート表示エリアを追加 -->
+                        <div id="weaknessReport" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg space-y-2">
+                            <p class="text-center text-gray-500">敗北データを分析して、あなたの弱点をレポートします...</p>
+                        </div>
                         <div id="weaknessHeatmap" class="overflow-x-auto"></div>
                     </div>
                 </div>
@@ -1122,7 +1124,6 @@
             document.getElementById('totalRecord').textContent=`${w}勝${d.length-w}敗`; document.getElementById('winRate').textContent=d.length>0?`${Math.round(w/d.length*100)}%`:'0%'; document.getElementById('recent20').textContent=r20.length>0?`${Math.round(r20.filter(b=>b.result==='勝利').length/r20.length*100)}%`:'0%'; document.getElementById('winStreak').textContent=s;
             this.updateFirstSecondStats(); this.updateEnvironmentStats(); this.updateTimeSlotStats(); this.updateOpponentAnalysis(); this.updateWinRateChart();
             
-            // ★★★ 変更点 ★★★ 今日の戦績を計算して表示する処理
             const today = new Date().toDateString();
             const todayData = this.state.battleData.filter(battle => {
                 const battleDate = new Date(battle.timestamp).toDateString();
@@ -1391,7 +1392,13 @@
                         <div><h4 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fas fa-heart-broken text-red-500 mr-2"></i>敗因の内訳</h4><div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div></div>
                     </div>
                     <div class="mt-8"><h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4><div class="chart-container"><canvas id="winRateImpactChart"></canvas></div></div>
-                    <div class="mt-8"><h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4><div id="weaknessHeatmap" class="overflow-x-auto"></div></div>`;
+                    <div class="mt-8">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
+                        <div id="weaknessReport" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg space-y-2">
+                            <p class="text-center text-gray-500">敗北データを分析して、あなたの弱点をレポートします...</p>
+                        </div>
+                        <div id="weaknessHeatmap" class="overflow-x-auto"></div>
+                    </div>`;
                 }
             }
 
@@ -1434,26 +1441,88 @@
             }, { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100, beginAtZero: true } }, plugins: { legend: { display: false } } });
         },
 
+        // ★★★ 変更点 ★★★ 弱点レポート機能を追加した新しい関数
         updateWeaknessHeatmap() {
             const container = document.getElementById('weaknessHeatmap');
-            if(!container) return;
-            const { classes, mistakeTypes, accidentTypes } = this.state, allWeaknesses = [...mistakeTypes, ...accidentTypes], heatmapData = {};
-            allWeaknesses.forEach(w => { heatmapData[w] = {}; classes.forEach(c => heatmapData[w][c] = 0); });
-            this.state.filteredData.forEach(b => {
-                if (b.playingMistake !== 'なし') heatmapData[b.playingMistake][b.opponentClass]++;
-                if (b.handAccident !== 'なし') heatmapData[b.handAccident][b.opponentClass]++;
+            const reportContainer = document.getElementById('weaknessReport');
+            if(!container || !reportContainer) return;
+
+            const losses = this.state.filteredData.filter(b => b.result === '敗北');
+            if (losses.length < 5) {
+                container.innerHTML = '<p class="text-center text-gray-500 p-4">敗北データが5件以上集まると、弱点分析が表示されます。</p>';
+                reportContainer.innerHTML = '<p class="text-center text-gray-500">敗北データを分析中です...</p>';
+                return;
+            }
+
+            const { classes, mistakeTypes, accidentTypes } = this.state;
+            const allWeaknesses = [...mistakeTypes, ...accidentTypes];
+            const heatmapData = {};
+            const weaknessTotalCount = {};
+
+            allWeaknesses.forEach(w => {
+                heatmapData[w] = {};
+                classes.forEach(c => heatmapData[w][c] = 0);
+                weaknessTotalCount[w] = 0;
             });
+
+            losses.forEach(b => {
+                const opponentClass = b.opponentClass;
+                if (b.playingMistake !== 'なし' && allWeaknesses.includes(b.playingMistake)) {
+                    heatmapData[b.playingMistake][opponentClass]++;
+                    weaknessTotalCount[b.playingMistake]++;
+                }
+                if (b.handAccident !== 'なし' && allWeaknesses.includes(b.handAccident)) {
+                    heatmapData[b.handAccident][opponentClass]++;
+                    weaknessTotalCount[b.handAccident]++;
+                }
+            });
+
             let html = '<div class="heatmap-table"><div class="heatmap-header"></div>';
             classes.forEach(c => html += `<div class="heatmap-header">${c}</div>`);
             allWeaknesses.forEach(w => {
                 html += `<div class="heatmap-header self-center">${w}</div>`;
                 classes.forEach(c => {
-                    const count = heatmapData[w][c], alpha = count > 0 ? Math.min(1, 0.2 + count / 5) : 0;
+                    const count = heatmapData[w][c];
+                    const alpha = count > 0 ? Math.min(1, 0.2 + count / 5) : 0;
                     const bgColor = alpha > 0 ? `rgba(239, 68, 68, ${alpha})` : '#f3f4f6';
                     html += `<div class="heatmap-cell" style="background-color: ${bgColor}; color: ${alpha > 0.5 ? 'white' : 'black'}">${count > 0 ? count : '-'}</div>`;
                 });
             });
             container.innerHTML = html + '</div>';
+
+            let reportHTML = `<h5 class="text-md font-bold text-red-800"><i class="fas fa-exclamation-triangle mr-2"></i>パーソナル弱点レポート</h5>`;
+            const reportItems = [];
+
+            const sortedWeaknesses = Object.entries(weaknessTotalCount).sort((a, b) => b[1] - a[1]);
+            if (sortedWeaknesses.length > 0 && sortedWeaknesses[0][1] > 0) {
+                reportItems.push(`あなたの最も頻度の高い敗因は<strong>「${sortedWeaknesses[0][0]}」</strong>です（期間中 ${sortedWeaknesses[0][1]}回）。まずこの点の改善を意識すると、勝率アップに繋がるかもしれません。`);
+            }
+
+            let maxCount = 0;
+            let worstMatchup = null;
+            allWeaknesses.forEach(w => {
+                classes.forEach(c => {
+                    if (heatmapData[w][c] > maxCount) {
+                        maxCount = heatmapData[w][c];
+                        worstMatchup = { weakness: w, class: c, count: maxCount };
+                    }
+                });
+            });
+            if (worstMatchup && worstMatchup.count > 1) {
+                reportItems.push(`特に<strong>「対${worstMatchup.class}」</strong>戦では<strong>「${worstMatchup.weakness}」</strong>が多発しています（${worstMatchup.count}回）。このマッチアップでは、特にこの点を注意深くプレイしてみましょう。`);
+            }
+            
+            if(reportItems.length > 0) {
+                reportHTML += '<ul class="list-disc list-inside text-sm text-red-700 space-y-1">';
+                reportItems.forEach(item => {
+                    reportHTML += `<li>${item}</li>`;
+                });
+                reportHTML += '</ul>';
+            } else {
+                reportHTML += '<p class="text-green-700 font-semibold"><i class="fas fa-check-circle mr-2"></i>素晴らしい！現在、特筆すべき弱点の偏りはありません。この調子です！</p>';
+            }
+
+            reportContainer.innerHTML = reportHTML;
         },
 
         deleteBattle(id) {if(confirm('この戦績を削除しますか？')){this.state.battleData=this.state.battleData.filter(b=>b.id!==id);localStorage.setItem('shadowverseBattleData',JSON.stringify(this.state.battleData));this.updateAllAnalysis();this.showNotification('戦績を削除しました','success');}},
