@@ -599,7 +599,6 @@
                 
                 <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">勝率推移</h3><div class="chart-container"><canvas id="winRateChart"></canvas></div></div>
 
-                <!-- ★★★ ここからが追加部分 ★★★ -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <div class="card p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">
@@ -620,7 +619,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ★★★ ここまでが追加部分 ★★★ -->
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <div class="card p-6">
@@ -733,6 +731,19 @@
                         <div id="weaknessHeatmap" class="overflow-x-auto"></div>
                     </div>
                 </div>
+                
+                <!-- ★★★ ここからが追加部分 ★★★ -->
+                <div class="card p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-hand-holding-heart text-pink-500 mr-2"></i>
+                        マリガン自己評価と勝率の関係
+                    </h3>
+                    <div id="mulliganAnalysisStats" class="space-y-4">
+                        <!-- ここにJavaScriptで計算した結果が表示されます -->
+                        <p class="text-center text-gray-500 p-4">データを分析中です...</p>
+                    </div>
+                </div>
+                <!-- ★★★ ここまでが追加部分 ★★★ -->
 
             </section>
 
@@ -1203,7 +1214,6 @@
                 todayRecordEl.textContent = `${todayWins}勝 ${todayTotal - todayWins}敗`;
             }
             this.updateTurnAnalysis();
-            // ★★★ 変更点 ★★★ 新しい分析関数を呼び出す
             this.updateClassTurnAnalysis();
             this.updateFirstSecondTurnAnalysis();
         },
@@ -1229,6 +1239,7 @@
             this.updateWinRateDistributionChart(); 
             this.updateStreakAnalysis();
             this.updatePlayingAnalysis();
+            this.updateMulliganAnalysis(); // ★★★ 追加した関数の呼び出し ★★★
         },
 
         updateMatchupAnalysis() { this.updateMatchupHeatmap(); this.updateDetailedMatchupStats(); this.updateOpponentRankChart(); this.updateOpponentGroupChart(); this.updateFirstSecondDetailChart(); },
@@ -1357,7 +1368,6 @@
             });
         },
 
-        // ★★★ ここからが追加された関数 ★★★
         updateClassTurnAnalysis() {
             const container = document.getElementById('classTurnAnalysisStats');
             if (!container) return;
@@ -1473,7 +1483,6 @@
                 </div>
             `;
         },
-        // ★★★ ここまでが追加された関数 ★★★
         
         updateTimeSeriesChart() {
             const d=this.state.filteredData;
@@ -1783,6 +1792,62 @@
 
             reportContainer.innerHTML = reportHTML;
         },
+
+        // ★★★ ここからが追加された関数 ★★★
+        updateMulliganAnalysis() {
+            const container = document.getElementById('mulliganAnalysisStats');
+            if (!container) return;
+
+            const data = this.state.filteredData;
+            if (data.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 p-4">分析するデータがありません。</p>';
+                return;
+            }
+
+            const stats = {
+                '理想的': { wins: 0, total: 0 },
+                '普通': { wins: 0, total: 0 },
+                '失敗': { wins: 0, total: 0 }
+            };
+
+            data.forEach(b => {
+                // mulliganSuccess の値が存在する場合のみ処理
+                if (b.mulliganSuccess && stats[b.mulliganSuccess]) {
+                    stats[b.mulliganSuccess].total++;
+                    if (b.result === '勝利') {
+                        stats[b.mulliganSuccess].wins++;
+                    }
+                }
+            });
+
+            const createStatRow = (label, statData, colorClass, iconClass) => {
+                const winRate = statData.total > 0 ? ((statData.wins / statData.total) * 100).toFixed(1) : '0.0';
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg transition-all hover:shadow-md hover:bg-white">
+                        <div class="flex items-center">
+                            <i class="fas ${iconClass} ${colorClass} mr-3 fa-fw"></i>
+                            <span class="font-medium">マリガン「${label}」評価時</span>
+                        </div>
+                        <div>
+                            <span class="font-bold text-lg ${colorClass}">${winRate}%</span>
+                            <span class="text-sm text-gray-600 ml-2">(${statData.wins}勝 / ${statData.total}戦)</span>
+                        </div>
+                    </div>
+                `;
+            };
+
+            let html = '';
+            if (stats['理想的'].total === 0 && stats['普通'].total === 0 && stats['失敗'].total === 0) {
+                 html = '<p class="text-center text-gray-500 p-4">マリガン評価が記録されたデータがありません。</p>';
+            } else {
+                html += createStatRow('理想的', stats['理想的'], 'text-green-600', 'fa-laugh-beam');
+                html += createStatRow('普通', stats['普通'], 'text-blue-600', 'fa-meh');
+                html += createStatRow('失敗', stats['失敗'], 'text-red-600', 'fa-frown');
+            }
+
+            container.innerHTML = html;
+        },
+        // ★★★ ここまでが追加された関数 ★★★
 
         deleteBattle(id) {if(confirm('この戦績を削除しますか？')){this.state.battleData=this.state.battleData.filter(b=>b.id!==id);localStorage.setItem('shadowverseBattleData',JSON.stringify(this.state.battleData));this.updateAllAnalysis();this.showNotification('戦績を削除しました','success');}},
         exportData() {const s=JSON.stringify({battleData: this.state.battleData, deckNicknames: this.state.deckNicknameMap, templates: this.state.templates},null,2),b=new Blob([s],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`sdb_data_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(u);this.showNotification('データをエクスポートしました','success');},
