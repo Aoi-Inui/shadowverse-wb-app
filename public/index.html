@@ -429,6 +429,17 @@
                             </select>
                         </div>
                         
+                        <!-- ★★★ 変更点 ★★★ 決着ターン入力欄を追加 -->
+                        <div>
+                            <label for="endTurn" class="block text-sm font-medium text-gray-700 mb-2">
+                                決着ターン
+                                <span class="tooltip" data-tooltip="何ターン目に試合が決着したか入力します。">
+                                    <i class="fas fa-info-circle text-blue-500 ml-1"></i>
+                                </span>
+                            </label>
+                            <input type="number" id="endTurn" class="input-field w-full p-3" placeholder="例: 8" min="1" max="50">
+                        </div>
+                        
                         <div>
                             <label for="opponentRank" class="block text-sm font-medium text-gray-700 mb-2">相手のランク</label>
                             <select id="opponentRank" class="input-field w-full p-3" required>
@@ -589,6 +600,30 @@
                 
                 <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">勝率推移</h3><div class="chart-container"><canvas id="winRateChart"></canvas></div></div>
 
+                <!-- ★★★ 変更点 ★★★ キルターン/被キルターン分析グラフエリアを追加 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">
+                            <i class="fas fa-gavel text-green-500 mr-2"></i>
+                            キルターン分布
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="killTurnChart"></canvas>
+                        </div>
+                        <div id="killTurnSummary" class="text-center mt-4 font-semibold"></div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">
+                            <i class="fas fa-skull-crossbones text-red-500 mr-2"></i>
+                            被キルターン分布
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="loseTurnChart"></canvas>
+                        </div>
+                        <div id="loseTurnSummary" class="text-center mt-4 font-semibold"></div>
+                    </div>
+                </div>
+
                 <div class="card p-6 mt-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">
                         <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
@@ -671,7 +706,6 @@
                     </div>
                     <div class="mt-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
-                        <!-- ★★★ 変更点 ★★★ 弱点レポート表示エリアを追加 -->
                         <div id="weaknessReport" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg space-y-2">
                             <p class="text-center text-gray-500">敗北データを分析して、あなたの弱点をレポートします...</p>
                         </div>
@@ -865,6 +899,8 @@
                 opponentClass: document.getElementById('opponentClass').value,
                 result: document.getElementById('result').value,
                 firstSecond: document.getElementById('firstSecond').value,
+                // ★★★ 変更点 ★★★ 決着ターンをデータに保存
+                endTurn: parseInt(document.getElementById('endTurn').value, 10) || null,
                 opponentRank: document.getElementById('opponentRank').value,
                 opponentGroup: document.getElementById('opponentGroup').value,
                 handAccident: document.getElementById('handAccident').value,
@@ -1135,6 +1171,8 @@
             if (todayRecordEl) {
                 todayRecordEl.textContent = `${todayWins}勝 ${todayTotal - todayWins}敗`;
             }
+            // ★★★ 変更点 ★★★ ターン分析関数の呼び出しを追加
+            this.updateTurnAnalysis();
         },
         
         updateAdvancedAnalysis() {
@@ -1215,6 +1253,79 @@
             for(let i=1;i<=d30.length;i++){l.push(`${d.length - d30.length + i}戦目`);r.push(Math.round(d.slice(0, d.length - d30.length + i).filter(b=>b.result==='勝利').length/(d.length - d30.length + i)*100));}
             this.createChart('winRateChart','line',{labels:l,datasets:[{label:'勝率推移 (直近30戦)',data:r,borderColor:'#ff9a9e',tension:0.4}]},{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:100}}});
         },
+        
+        // ★★★ 変更点 ★★★ キルターン/被キルターン分析の関数を追加
+        updateTurnAnalysis() {
+            const data = this.state.filteredData;
+            const winData = data.filter(b => b.result === '勝利' && b.endTurn);
+            const loseData = data.filter(b => b.result === '敗北' && b.endTurn);
+
+            this.renderTurnChart('killTurnChart', 'killTurnSummary', winData, 'キルターン', '#10b981');
+            this.renderTurnChart('loseTurnChart', 'loseTurnSummary', loseData, '被キルターン', '#ef4444');
+        },
+
+        // ★★★ 変更点 ★★★ ターン分析グラフ描画用のヘルパー関数を追加
+        renderTurnChart(canvasId, summaryId, turnData, label, color) {
+            const summaryContainer = document.getElementById(summaryId);
+
+            if (!this.prepareChartContainer(canvasId, 1, turnData.length, `${label}のデータがありません。`)) {
+                if(summaryContainer) summaryContainer.innerHTML = '';
+                return;
+            }
+            
+            const turns = turnData.map(b => b.endTurn);
+            const avgTurn = turns.reduce((a, b) => a + b, 0) / turns.length;
+            
+            if(summaryContainer) summaryContainer.innerHTML = `平均: <span style="color: ${color};">${avgTurn.toFixed(1)}</span> ターン`;
+            
+            const turnCounts = {};
+            turns.forEach(turn => {
+                turnCounts[turn] = (turnCounts[turn] || 0) + 1;
+            });
+
+            const sortedTurns = Object.entries(turnCounts).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+            
+            const chartLabels = sortedTurns.map(item => `${item[0]} T`);
+            const chartData = sortedTurns.map(item => item[1]);
+
+            this.createChart(canvasId, 'bar', {
+                labels: chartLabels,
+                datasets: [{
+                    label: `${label}数`,
+                    data: chartData,
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '試合数'
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '決着ターン'
+                        }
+                    }
+                }
+            });
+        },
+        
         updateTimeSeriesChart() {
             const d=this.state.filteredData;
             if (!this.prepareChartContainer('timeSeriesChart', 1, d.length, '戦績を記録すると時系列分析が表示されます。')) return;
@@ -1441,7 +1552,6 @@
             }, { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100, beginAtZero: true } }, plugins: { legend: { display: false } } });
         },
 
-        // ★★★ 変更点 ★★★ 弱点レポート機能を追加した新しい関数
         updateWeaknessHeatmap() {
             const container = document.getElementById('weaknessHeatmap');
             const reportContainer = document.getElementById('weaknessReport');
