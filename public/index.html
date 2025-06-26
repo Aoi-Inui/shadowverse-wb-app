@@ -232,6 +232,41 @@
             overflow-x: auto;
             min-width: 800px;
         }
+
+        /* ★★★ 追加機能：戦績カレンダーのCSS ★★★ */
+        .calendar-day {
+            position: relative;
+            padding-top: 100%; /* 正方形を維持するためのハック */
+            border-radius: 4px;
+            background-color: #f3f4f6; /* デフォルトの色 */
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .calendar-day:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .day-number {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .day-stats {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .weekday-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+            color: #6b7280;
+            padding-bottom: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen p-4">
@@ -518,6 +553,27 @@
                 </div>
                 
                 <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">勝率推移</h3><div class="chart-container"><canvas id="winRateChart"></canvas></div></div>
+
+                <!-- ★★★ 追加機能：戦績カレンダーのHTML ★★★ -->
+                <div class="card p-6 mt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+                        戦績カレンダー
+                    </h3>
+                    <div id="calendar-controls" class="flex justify-between items-center mb-4">
+                        <button id="prev-month" class="btn-secondary px-3 py-1 text-sm">&lt; 前の月</button>
+                        <h4 id="calendar-month-year" class="text-xl font-bold"></h4>
+                        <button id="next-month" class="btn-secondary px-3 py-1 text-sm">次の月 &gt;</button>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+                        <!-- ここに曜日と日付のマスがJavaScriptで生成される -->
+                    </div>
+                    <div class="flex justify-end mt-4 text-xs text-gray-500 space-x-4">
+                        <span><i class="fas fa-square mr-1" style="color: #fecaca;"></i> 負け越し</span>
+                        <span><i class="fas fa-square mr-1" style="color: #e5e7eb;"></i> トントン</span>
+                        <span><i class="fas fa-square mr-1" style="color: #a7f3d0;"></i> 勝ち越し</span>
+                    </div>
+                </div>
             </section>
 
             <!-- Advanced Analysis Tab -->
@@ -651,6 +707,7 @@
             charts: {},
             currentPeriod: 'all',
             filteredData: [],
+            calendarDate: new Date(), // ★★★ 追加機能：カレンダーの日付管理 ★★★
             classes: ['ロイヤル', 'ウィッチ', 'ドラゴン', 'ナイトメア', 'ビショップ', 'エルフ', 'ネメシス'],
             classColors: ['#ff9a9e', '#fecfef', '#4facfe', '#00f2fe', '#667eea', '#764ba2', '#f093fb', '#f5576c', '#8BC34A', '#FFC107', '#795548', '#607D8B'],
             mistakeTypes: ['序盤判断ミス', '中盤判断ミス', '終盤判断ミス', '進化タイミングミス', 'リーサル見落とし'],
@@ -676,6 +733,10 @@
             document.querySelector('.period-selector').addEventListener('click', (e) => this.handlePeriodClick(e));
             document.getElementById('deckProgressSelector').addEventListener('change', () => this.updateDeckProgressChart());
             document.getElementById('result').addEventListener('change', (e) => this.toggleReasonCheckboxes(e.target.value));
+
+            // ★★★ 追加機能：カレンダーのボタンリスナー ★★★
+            document.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
+            document.getElementById('next-month').addEventListener('click', () => this.changeMonth(1));
 
             document.body.addEventListener('click', (e) => {
                 const actionButton = e.target.closest('[data-action]');
@@ -733,14 +794,12 @@
             }
         },
 
-        // ★★★ UPGRADED ★★★ 保存後ポップアップ方式
         handleFormSubmit(e) {
             e.preventDefault();
             const form = e.target;
             const deckCode = document.getElementById('deckCode').value.trim();
             const isNewDeck = deckCode && !this.state.deckNicknameMap[deckCode];
 
-            // 1. 先に戦績を保存する
             const battleRecord = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
@@ -765,7 +824,6 @@
             form.reset();
             this.toggleReasonCheckboxes('');
             
-            // 2. 保存完了通知を出す
             this.showNotification('戦績を保存しました！', 'success');
 
             const updateAndAnalyze = () => {
@@ -773,7 +831,6 @@
                 this.updateAllAnalysis();
             };
 
-            // 3. もし新しいデッキなら、通知の後にポップアップを出す
             if (isNewDeck) {
                 setTimeout(() => {
                     const nickname = prompt(`新しいデッキが登録されました。\nこのデッキに愛称をつけますか？ (例: 秘術ウィッチ)`, `マイデッキ ${Object.keys(this.state.deckNicknameMap).length + 1}`);
@@ -798,7 +855,10 @@
             this.filterDataByPeriod();
             setTimeout(() => {
                 switch(tabName) {
-                    case 'statistics': this.updateStatistics(); break;
+                    case 'statistics':
+                        this.updateStatistics();
+                        this.updateCalendar(); // ★★★ 追加機能：統計タブ表示時にカレンダーを更新 ★★★
+                        break;
                     case 'advanced-analysis': this.updateAdvancedAnalysis(); break;
                     case 'matchup-analysis': this.updateMatchupAnalysis(); break;
                     case 'deck-progress': this.updateDeckAnalysis(); break;
@@ -933,6 +993,92 @@
             if (t1<10||t2<10) return {significant:false}; const p1=w1/t1,p2=w2/t2,pp=(w1+w2)/(t1+t2),se=Math.sqrt(pp*(1-pp)*(1/t1+1/t2)),z=Math.abs(p1-p2)/se;
             return {significant:2*(1-this.normalCDF(z))<0.05};
         },
+
+        // ★★★ ここから戦績カレンダー機能のメソッド群 ★★★
+        changeMonth(offset) {
+            this.state.calendarDate.setMonth(this.state.calendarDate.getMonth() + offset);
+            this.updateCalendar();
+        },
+
+        updateCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthYearEl = document.getElementById('calendar-month-year');
+            const { calendarDate, battleData } = this.state;
+
+            if (!grid || !monthYearEl) return; // 他のタブが表示されている場合は何もしない
+
+            grid.innerHTML = ''; // 古いカレンダーをクリア
+
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+
+            monthYearEl.textContent = `${year}年 ${month + 1}月`;
+
+            // 1. 日付ごとの戦績データを集計
+            const dailyStats = {};
+            battleData.forEach(b => {
+                const d = new Date(b.timestamp);
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    const dayKey = d.getDate();
+                    if (!dailyStats[dayKey]) {
+                        dailyStats[dayKey] = { wins: 0, losses: 0 };
+                    }
+                    b.result === '勝利' ? dailyStats[dayKey].wins++ : dailyStats[dayKey].losses++;
+                }
+            });
+
+            // 2. カレンダーのHTMLを生成
+            // 曜日のヘッダーを追加
+            ['日', '月', '火', '水', '木', '金', '土'].forEach(day => {
+                grid.innerHTML += `<div class="weekday-header">${day}</div>`;
+            });
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // 1日までの空白マスを生成
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                grid.innerHTML += '<div></div>';
+            }
+
+            // 日付マスを生成
+            for (let day = 1; day <= daysInMonth; day++) {
+                const stats = dailyStats[day];
+                let bgColor = '#f3f4f6'; // デフォルト
+                let statsText = '';
+
+                if (stats) {
+                    const totalGames = stats.wins + stats.losses;
+                    const winRate = totalGames > 0 ? stats.wins / totalGames : 0;
+                    
+                    // 色の決定ロジック
+                    if (winRate > 0.55) bgColor = '#a7f3d0'; // 勝ち越し (緑)
+                    else if (winRate < 0.45 && totalGames > 0) bgColor = '#fecaca'; // 負け越し (赤)
+                    else bgColor = '#e5e7eb'; // トントン (グレー)
+                    
+                    // 色の濃さを対戦数で変える
+                    const opacity = 0.4 + Math.min(0.6, totalGames / 20); // 20戦でMAXの濃さ
+                    bgColor = this.hexToRgba(bgColor, opacity);
+
+                    statsText = `<span class="day-stats">${stats.wins}W ${stats.losses}L</span>`;
+                }
+                
+                grid.innerHTML += `
+                    <div class="calendar-day" style="background-color: ${bgColor};" title="${year}/${month+1}/${day}">
+                        <span class="day-number">${day}</span>
+                        ${statsText}
+                    </div>
+                `;
+            }
+        },
+
+        hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        },
+        // ★★★ 戦績カレンダー機能のメソッド群ここまで ★★★
 
         updateStatistics() {
             const d = this.state.filteredData, w = d.filter(b=>b.result==='勝利').length, r20 = d.slice(-20); let s=0; for(let i=d.length-1;i>=0;i--){if(d[i].result==='勝利')s++;else break;}
