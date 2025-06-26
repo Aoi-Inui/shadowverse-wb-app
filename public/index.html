@@ -631,7 +631,7 @@
                         <div class="data-table"><div id="battleRecords" class="space-y-2"></div></div>
                     </div>
                 </div>
-                <!-- ★★★ NEW ★★★ デッキ名鑑セクション -->
+                <!-- デッキ名鑑セクション -->
                 <div class="card p-6 mt-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">
                         <i class="fas fa-book-open text-indigo-500 mr-2"></i>デッキ名鑑
@@ -733,19 +733,14 @@
             }
         },
 
+        // ★★★ UPGRADED ★★★ 保存後ポップアップ方式
         handleFormSubmit(e) {
             e.preventDefault();
             const form = e.target;
             const deckCode = document.getElementById('deckCode').value.trim();
+            const isNewDeck = deckCode && !this.state.deckNicknameMap[deckCode];
 
-            if (deckCode && !this.state.deckNicknameMap[deckCode]) {
-                const nickname = prompt(`新しいデッキコードが入力されました。\nこのデッキの愛称をつけますか？ (例: 秘術ウィッチ)`, `マイデッキ ${Object.keys(this.state.deckNicknameMap).length + 1}`);
-                if (nickname && nickname.trim() !== '') {
-                    this.state.deckNicknameMap[deckCode] = nickname.trim();
-                    localStorage.setItem('shadowverseDeckNicknames', JSON.stringify(this.state.deckNicknameMap));
-                }
-            }
-
+            // 1. 先に戦績を保存する
             const battleRecord = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
@@ -769,9 +764,29 @@
             this.saveLastSelectedClass(battleRecord.myClass);
             form.reset();
             this.toggleReasonCheckboxes('');
+            
+            // 2. 保存完了通知を出す
             this.showNotification('戦績を保存しました！', 'success');
-            this.filterDataByPeriod();
-            this.updateAllAnalysis();
+
+            const updateAndAnalyze = () => {
+                this.filterDataByPeriod();
+                this.updateAllAnalysis();
+            };
+
+            // 3. もし新しいデッキなら、通知の後にポップアップを出す
+            if (isNewDeck) {
+                setTimeout(() => {
+                    const nickname = prompt(`新しいデッキが登録されました。\nこのデッキに愛称をつけますか？ (例: 秘術ウィッチ)`, `マイデッキ ${Object.keys(this.state.deckNicknameMap).length + 1}`);
+                    if (nickname && nickname.trim() !== '') {
+                        this.state.deckNicknameMap[deckCode] = nickname.trim();
+                        localStorage.setItem('shadowverseDeckNicknames', JSON.stringify(this.state.deckNicknameMap));
+                        this.showNotification('愛称を登録しました！', 'success');
+                    }
+                    updateAndAnalyze();
+                }, 100); 
+            } else {
+                updateAndAnalyze();
+            }
         },
 
         switchTab(tabName, clickedButton) {
@@ -995,9 +1010,9 @@
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                             <p class="font-bold text-gray-800">${name}</p>
-                            <p class="text-xs text-gray-500 truncate">${code}</p>
+                            <p class="text-xs text-gray-500 truncate" title="${code}">${code}</p>
                         </div>
-                        <button data-action="edit-nickname" data-deck-code="${code}" class="btn-tertiary px-3 py-1 text-sm no-print">
+                        <button data-action="edit-nickname" data-deck-code="${encodeURIComponent(code)}" class="btn-tertiary px-3 py-1 text-sm no-print">
                             <i class="fas fa-edit mr-1"></i>編集
                         </button>
                     </div>
@@ -1006,7 +1021,8 @@
             container.innerHTML = html || '<p class="text-gray-500 text-center">登録済みのデッキがありません</p>';
         },
         
-        handleEditNickname(deckCode) {
+        handleEditNickname(encodedDeckCode) {
+            const deckCode = decodeURIComponent(encodedDeckCode);
             const oldName = this.state.deckNicknameMap[deckCode] || '';
             const newName = prompt(`「${oldName}」の新しい愛称を入力してください。`, oldName);
             if (newName && newName.trim() !== '') {
