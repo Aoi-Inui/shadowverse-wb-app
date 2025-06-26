@@ -345,7 +345,6 @@
             <section id="record" class="tab-content active">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">新しい戦績を記録</h2>
 
-                <!-- ★★★ 入力テンプレート機能 UI ★★★ -->
                 <div class="card p-4 mb-6 bg-purple-50 border-purple-200">
                     <h3 class="text-lg font-bold text-purple-800 mb-3">
                         <i class="fas fa-magic mr-2"></i>入力テンプレート
@@ -355,7 +354,6 @@
                             <label for="templateSelector" class="block text-sm font-medium text-gray-700 mb-2">テンプレートを読み込む</label>
                             <select id="templateSelector" class="input-field w-full p-3">
                                 <option value="">テンプレートを選択...</option>
-                                <!-- ここに保存されたテンプレートが動的に追加される -->
                             </select>
                         </div>
                         <div>
@@ -365,10 +363,8 @@
                         </div>
                     </div>
                     <div id="templateList" class="mt-4 space-y-2">
-                        <!-- 保存されたテンプレートの一覧と削除ボタンがここに表示される -->
                     </div>
                 </div>
-                <!-- ★★★ UIここまで ★★★ -->
 
                 <form id="battleForm" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -512,6 +508,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">勝因 (複数選択可)</label>
+                            <!-- ★★★ 勝因リストの拡充 ★★★ -->
                             <div class="checkbox-group">
                                 <div class="checkbox-item"><input type="checkbox" id="win1" value="完璧な序盤展開" class="mr-2"><label for="win1" class="text-sm">完璧な序盤展開</label></div>
                                 <div class="checkbox-item"><input type="checkbox" id="win2" value="中盤優位維持" class="mr-2"><label for="win2" class="text-sm">中盤優位維持</label></div>
@@ -522,6 +519,12 @@
                                 <div class="checkbox-item"><input type="checkbox" id="win7" value="リーサル計算正確" class="mr-2"><label for="win7" class="text-sm">リーサル計算正確</label></div>
                                 <div class="checkbox-item"><input type="checkbox" id="win8" value="冷静な判断力" class="mr-2"><label for="win8" class="text-sm">冷静な判断力</label></div>
                                 <div class="checkbox-item"><input type="checkbox" id="win9" value="有利マッチアップ" class="mr-2"><label for="win9" class="text-sm">有利マッチアップ</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win10" value="神ドロー/トップ解決" class="mr-2"><label for="win10" class="text-sm">神ドロー/トップ解決</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win11" value="相手のプレミ誘発" class="mr-2"><label for="win11" class="text-sm">相手のプレミ誘発</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win12" value="盤面制圧" class="mr-2"><label for="win12" class="text-sm">盤面制圧</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win13" value="OTK/コンボ成功" class="mr-2"><label for="win13" class="text-sm">OTK/コンボ成功</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win14" value="リソースアウト勝ち" class="mr-2"><label for="win14" class="text-sm">リソースアウト勝ち</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="win15" value="リーサルずらし成功" class="mr-2"><label for="win15" class="text-sm">リーサルずらし成功</label></div>
                             </div>
                         </div>
                         
@@ -633,23 +636,33 @@
                 </div>
                 <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">連勝・連敗分析</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4"><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連勝</p><p class="text-2xl font-bold text-green-600" id="maxWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連敗</p><p class="text-2xl font-bold text-red-600" id="maxLoseStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連勝長</p><p class="text-2xl font-bold text-blue-600" id="avgWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連敗長</p><p class="text-2xl font-bold text-orange-600" id="avgLoseStreak">0</p></div></div><div class="chart-container"><canvas id="streakChart"></canvas></div></div>
 
+                <!-- ★★★ 勝因分析チャート追加に伴うセクション変更 ★★★ -->
                 <div id="playing-analysis-section" class="card p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-2">
-                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>プレイング・事故分析
+                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>勝ち負け要因分析
                     </h3>
-                    <p class="text-gray-600 mb-6">あなたのプレイ傾向を分析し、改善点を浮き彫りにします。</p>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-gray-800 mb-4">敗因の内訳</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                            <div class="chart-container h-64"><canvas id="lossCategoryChart"></canvas></div>
+                    <p class="text-gray-600 mb-6">あなたの勝ちパターンと負けパターンを分析し、強みと改善点を浮き彫りにします。</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-800 mb-4 text-center">
+                                <i class="fas fa-trophy text-yellow-500 mr-2"></i>勝因の内訳
+                            </h4>
+                            <div class="chart-container h-80"><canvas id="winReasonChart"></canvas></div>
+                        </div>
+                        <div>
+                             <h4 class="text-lg font-bold text-gray-800 mb-4 text-center">
+                                <i class="fas fa-heart-broken text-red-500 mr-2"></i>敗因の内訳
+                            </h4>
                             <div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div>
                         </div>
                     </div>
-                    <div class="mb-8">
+                    
+                    <div class="mt-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4>
                         <div class="chart-container"><canvas id="winRateImpactChart"></canvas></div>
                     </div>
-                    <div>
+                    <div class="mt-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
                         <div id="weaknessHeatmap" class="overflow-x-auto"></div>
                     </div>
@@ -726,7 +739,7 @@
         state: {
             battleData: [],
             deckNicknameMap: {},
-            templates: [], // ★★★ 入力テンプレート機能 ★★★
+            templates: [],
             charts: {},
             currentPeriod: 'all',
             filteredData: [],
@@ -740,13 +753,13 @@
         init() {
             this.state.battleData = JSON.parse(localStorage.getItem('shadowverseBattleData')) || [];
             this.state.deckNicknameMap = JSON.parse(localStorage.getItem('shadowverseDeckNicknames')) || {};
-            this.state.templates = JSON.parse(localStorage.getItem('shadowverseTemplates')) || []; // ★★★ 入力テンプレート機能 ★★★
+            this.state.templates = JSON.parse(localStorage.getItem('shadowverseTemplates')) || [];
             
             this.setupEventListeners();
             this.updateBPMultiplier();
             this.updateTimeSlot();
             this.loadLastSelectedClass();
-            this.updateTemplateUI(); // ★★★ 入力テンプレート機能 ★★★
+            this.updateTemplateUI();
             this.filterDataByPeriod();
             this.updateAllAnalysis();
         },
@@ -762,14 +775,12 @@
             document.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
             document.getElementById('next-month').addEventListener('click', () => this.changeMonth(1));
 
-            // ★★★ 入力テンプレート機能 ★★★
             document.getElementById('saveTemplateBtn').addEventListener('click', () => this.saveTemplate());
             document.getElementById('templateSelector').addEventListener('change', (e) => this.loadTemplate(e.target.value));
             document.getElementById('templateList').addEventListener('click', (e) => {
                 const deleteButton = e.target.closest('.delete-template-btn');
                 if (deleteButton) {
-                    const templateName = deleteButton.dataset.templateName;
-                    this.deleteTemplate(templateName);
+                    this.deleteTemplate(deleteButton.dataset.templateName);
                 }
             });
 
@@ -1037,17 +1048,11 @@
         updateCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthYearEl = document.getElementById('calendar-month-year');
-            const { calendarDate, battleData } = this.state;
-
             if (!grid || !monthYearEl) return;
-
             grid.innerHTML = '';
-
-            const year = calendarDate.getFullYear();
-            const month = calendarDate.getMonth();
-
+            const { calendarDate } = this.state;
+            const year = calendarDate.getFullYear(), month = calendarDate.getMonth();
             monthYearEl.textContent = `${year}年 ${month + 1}月`;
-
             const dailyStats = {};
             this.state.battleData.forEach(b => {
                 const d = new Date(b.timestamp);
@@ -1057,20 +1062,15 @@
                     b.result === '勝利' ? dailyStats[dayKey].wins++ : dailyStats[dayKey].losses++;
                 }
             });
-            
             ['日', '月', '火', '水', '木', '金', '土'].forEach(day => grid.innerHTML += `<div class="weekday-header">${day}</div>`);
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfMonth = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let i = 0; i < firstDayOfMonth; i++) grid.innerHTML += '<div></div>';
-
             for (let day = 1; day <= daysInMonth; day++) {
                 const stats = dailyStats[day];
                 let bgColor = '#f3f4f6', statsText = '', titleText = `${year}/${month+1}/${day}`;
                 if (stats) {
                     const total = stats.wins + stats.losses, rate = total > 0 ? stats.wins/total : 0;
-                    if (rate > 0.55) bgColor = '#a7f3d0';
-                    else if (rate < 0.45 && total > 0) bgColor = '#fecaca';
-                    else bgColor = '#e5e7eb';
+                    if (rate > 0.55) bgColor = '#a7f3d0'; else if (rate < 0.45 && total > 0) bgColor = '#fecaca'; else bgColor = '#e5e7eb';
                     bgColor = this.hexToRgba(bgColor, 0.4 + Math.min(0.6, total / 20));
                     statsText = `<span class="day-stats">${stats.wins}W ${stats.losses}L</span>`;
                     titleText += ` (${stats.wins}勝 ${stats.losses}敗)`;
@@ -1084,86 +1084,29 @@
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         },
 
-        // ★★★ ここから入力テンプレート機能のメソッド群 ★★★
         updateTemplateUI() {
-            const selector = document.getElementById('templateSelector');
-            const listContainer = document.getElementById('templateList');
-            
+            const selector = document.getElementById('templateSelector'), listContainer = document.getElementById('templateList');
             selector.innerHTML = '<option value="">テンプレートを選択...</option>';
-            this.state.templates.forEach(template => {
-                const option = document.createElement('option');
-                option.value = template.name;
-                option.textContent = template.name;
-                selector.appendChild(option);
-            });
-
+            this.state.templates.forEach(t => { const o = document.createElement('option'); o.value = t.name; o.textContent = t.name; selector.appendChild(o); });
             if (this.state.templates.length > 0) {
-                listContainer.innerHTML = this.state.templates.map(template => `
-                    <div class="flex items-center justify-between p-2 bg-purple-100 rounded-lg fade-in">
-                        <span class="text-sm font-medium text-purple-800">${template.name}</span>
-                        <button class="delete-template-btn text-red-500 hover:text-red-700 transition-colors" data-template-name="${template.name}" title="テンプレートを削除">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                listContainer.innerHTML = '<p class="text-center text-sm text-gray-500">保存されたテンプレートはありません。</p>';
-            }
+                listContainer.innerHTML = this.state.templates.map(t => `<div class="flex items-center justify-between p-2 bg-purple-100 rounded-lg fade-in"><span class="text-sm font-medium text-purple-800">${t.name}</span><button class="delete-template-btn text-red-500 hover:text-red-700 transition-colors" data-template-name="${t.name}" title="テンプレートを削除"><i class="fas fa-trash"></i></button></div>`).join('');
+            } else { listContainer.innerHTML = '<p class="text-center text-sm text-gray-500">保存されたテンプレートはありません。</p>'; }
         },
-
         saveTemplate() {
-            const templateName = prompt('この入力内容にテンプレート名をつけてください:', 'マイテンプレート' + (this.state.templates.length + 1));
-            if (!templateName || templateName.trim() === '') {
-                this.showNotification('テンプレート名が入力されませんでした。', 'error');
-                return;
-            }
-
-            if (this.state.templates.find(t => t.name === templateName)) {
-                if (!confirm(`テンプレート「${templateName}」は既に存在します。上書きしますか？`)) return;
-                this.state.templates = this.state.templates.filter(t => t.name !== templateName);
-            }
-
-            const templateData = {
-                name: templateName.trim(),
-                values: {
-                    myClass: document.getElementById('myClass').value,
-                    deckCode: document.getElementById('deckCode').value,
-                    opponentClass: document.getElementById('opponentClass').value,
-                    firstSecond: document.getElementById('firstSecond').value,
-                    opponentRank: document.getElementById('opponentRank').value,
-                    opponentGroup: document.getElementById('opponentGroup').value,
-                }
-            };
-            
-            this.state.templates.push(templateData);
-            this.state.templates.sort((a, b) => a.name.localeCompare(b.name));
-            localStorage.setItem('shadowverseTemplates', JSON.stringify(this.state.templates));
-            this.updateTemplateUI();
-            this.showNotification(`テンプレート「${templateName}」を保存しました！`, 'success');
+            const tName = prompt('この入力内容にテンプレート名をつけてください:', 'マイテンプレート' + (this.state.templates.length + 1));
+            if (!tName || tName.trim() === '') return this.showNotification('テンプレート名が入力されませんでした。', 'error');
+            if (this.state.templates.find(t => t.name === tName)) { if (!confirm(`テンプレート「${tName}」は既に存在します。上書きしますか？`)) return; this.state.templates = this.state.templates.filter(t => t.name !== tName); }
+            const tData = { name: tName.trim(), values: { myClass: document.getElementById('myClass').value, deckCode: document.getElementById('deckCode').value, opponentClass: document.getElementById('opponentClass').value, firstSecond: document.getElementById('firstSecond').value, opponentRank: document.getElementById('opponentRank').value, opponentGroup: document.getElementById('opponentGroup').value, } };
+            this.state.templates.push(tData); this.state.templates.sort((a, b) => a.name.localeCompare(b.name)); localStorage.setItem('shadowverseTemplates', JSON.stringify(this.state.templates)); this.updateTemplateUI(); this.showNotification(`テンプレート「${tName}」を保存しました！`, 'success');
         },
-
-        loadTemplate(templateName) {
-            if (!templateName) return;
-            const template = this.state.templates.find(t => t.name === templateName);
-            if (template) {
-                Object.keys(template.values).forEach(key => {
-                    const element = document.getElementById(key);
-                    if (element) element.value = template.values[key];
-                });
-                this.showNotification(`テンプレート「${templateName}」を読み込みました。`, 'success');
-                document.getElementById('templateSelector').value = '';
-            }
+        loadTemplate(tName) {
+            if (!tName) return;
+            const t = this.state.templates.find(t => t.name === tName);
+            if (t) { Object.keys(t.values).forEach(k => { const e = document.getElementById(k); if (e) e.value = t.values[k]; }); this.showNotification(`テンプレート「${tName}」を読み込みました。`, 'success'); document.getElementById('templateSelector').value = ''; }
         },
-
-        deleteTemplate(templateName) {
-            if (confirm(`テンプレート「${templateName}」を削除してもよろしいですか？`)) {
-                this.state.templates = this.state.templates.filter(t => t.name !== templateName);
-                localStorage.setItem('shadowverseTemplates', JSON.stringify(this.state.templates));
-                this.updateTemplateUI();
-                this.showNotification(`テンプレート「${templateName}」を削除しました。`, 'success');
-            }
+        deleteTemplate(tName) {
+            if (confirm(`テンプレート「${tName}」を削除してもよろしいですか？`)) { this.state.templates = this.state.templates.filter(t => t.name !== tName); localStorage.setItem('shadowverseTemplates', JSON.stringify(this.state.templates)); this.updateTemplateUI(); this.showNotification(`テンプレート「${tName}」を削除しました。`, 'success'); }
         },
-        // ★★★ メソッド群ここまで ★★★
 
         updateStatistics() {
             const d = this.state.filteredData, w = d.filter(b=>b.result==='勝利').length, r20 = d.slice(-20); let s=0; for(let i=d.length-1;i>=0;i--){if(d[i].result==='勝利')s++;else break;}
@@ -1207,29 +1150,9 @@
                 if (b.deckCode && b.deckCode.trim() !== '') {
                     const isUrl = b.deckCode.startsWith('http');
                     const linkHref = isUrl ? b.deckCode : `https://shadowverse-portal.com/deck_co/deck.html?deck_code=${b.deckCode}`;
-                    deckLinkHTML = `
-                        <a href="${linkHref}" target="_blank" rel="noopener noreferrer" class="btn-secondary text-xs px-3 py-1 no-print ml-4">
-                            <i class="fas fa-clone mr-1"></i> デッキ確認
-                        </a>
-                    `;
+                    deckLinkHTML = `<a href="${linkHref}" target="_blank" rel="noopener noreferrer" class="btn-secondary text-xs px-3 py-1 no-print ml-4"><i class="fas fa-clone mr-1"></i> デッキ確認</a>`;
                 }
-                return `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center">
-                            <span class="font-bold ${b.result==='勝利'?'text-green-600':'text-red-600'}">${b.result}</span>
-                            <span class="text-sm text-gray-600 ml-4">${new Date(b.timestamp).toLocaleString('ja-JP')}</span>
-                            ${deckLinkHTML}
-                        </div>
-                        <button data-action="delete-battle" data-id="${b.id}" class="text-red-500 no-print"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                        <div><strong>自分:</strong> ${b.myClass}</div>
-                        <div><strong>相手:</strong> ${b.opponentClass}</div>
-                        <div><strong>先攻後攻:</strong> ${b.firstSecond}</div>
-                        <div><strong>時間帯:</strong> ${b.timeSlot}</div>
-                    </div>
-                    ${b.memo?`<div class="mt-2 text-sm text-gray-600"><strong>メモ:</strong> ${b.memo}</div>`:''}
-                </div>`;
+                return `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}"><div class="flex justify-between items-start mb-2"><div class="flex items-center"><span class="font-bold ${b.result==='勝利'?'text-green-600':'text-red-600'}">${b.result}</span><span class="text-sm text-gray-600 ml-4">${new Date(b.timestamp).toLocaleString('ja-JP')}</span>${deckLinkHTML}</div><button data-action="delete-battle" data-id="${b.id}" class="text-red-500 no-print"><i class="fas fa-trash"></i></button></div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm"><div><strong>自分:</strong> ${b.myClass}</div><div><strong>相手:</strong> ${b.opponentClass}</div><div><strong>先攻後攻:</strong> ${b.firstSecond}</div><div><strong>時間帯:</strong> ${b.timeSlot}</div></div>${b.memo?`<div class="mt-2 text-sm text-gray-600"><strong>メモ:</strong> ${b.memo}</div>`:''}</div>`;
             }).join('');
             document.getElementById('battleRecords').innerHTML = html || '<p class="text-gray-500 text-center">戦績データがありません</p>';
         },
@@ -1237,17 +1160,7 @@
         updateDeckNicknameList() {
             const container = document.getElementById('deckNicknameList');
             const html = Object.entries(this.state.deckNicknameMap).map(([code, name]) => {
-                return `
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="font-bold text-gray-800">${name}</p>
-                            <p class="text-xs text-gray-500 truncate" title="${code}">${code}</p>
-                        </div>
-                        <button data-action="edit-nickname" data-deck-code="${encodeURIComponent(code)}" class="btn-tertiary px-3 py-1 text-sm no-print">
-                            <i class="fas fa-edit mr-1"></i>編集
-                        </button>
-                    </div>
-                `;
+                return `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><div><p class="font-bold text-gray-800">${name}</p><p class="text-xs text-gray-500 truncate" title="${code}">${code}</p></div><button data-action="edit-nickname" data-deck-code="${encodeURIComponent(code)}" class="btn-tertiary px-3 py-1 text-sm no-print"><i class="fas fa-edit mr-1"></i>編集</button></div>`;
             }).join('');
             container.innerHTML = html || '<p class="text-gray-500 text-center">登録済みのデッキがありません</p>';
         },
@@ -1438,135 +1351,92 @@
         },
 
 
+        // ★★★ 勝因分析チャート追加に伴う関数変更 ★★★
         updatePlayingAnalysis() {
-            const losses = this.state.filteredData.filter(b => b.result === '敗北');
-            const requiredLosses = 5;
             const section = document.getElementById('playing-analysis-section');
-            if (losses.length < requiredLosses) {
-                section.innerHTML = `<div class="text-center text-gray-500 p-8">敗北データを${requiredLosses}件以上記録すると、プレイング・事故分析が表示されます。</div>`;
+            const dataExists = this.state.filteredData.length > 0;
+
+            if (!dataExists) {
+                section.innerHTML = `<div class="text-center text-gray-500 p-8">データを記録すると、勝ち負け要因分析が表示されます。</div>`;
                 return;
             } else {
-                if (!section.querySelector('canvas')) {
+                // HTML構造を再描画（タブ切り替えでクリアされる場合があるため）
+                if (!section.querySelector('#winReasonChart')) {
                     section.innerHTML = `
                     <h3 class="text-xl font-bold text-gray-800 mb-2">
-                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>プレイング・事故分析
+                        <i class="fas fa-search-plus text-pink-500 mr-2"></i>勝ち負け要因分析
                     </h3>
-                    <p class="text-gray-600 mb-6">あなたのプレイ傾向を分析し、改善点を浮き彫りにします。</p>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-gray-800 mb-4">敗因の内訳</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                            <div class="chart-container h-64"><canvas id="lossCategoryChart"></canvas></div>
-                            <div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div>
-                        </div>
+                    <p class="text-gray-600 mb-6">あなたの勝ちパターンと負けパターンを分析し、強みと改善点を浮き彫りにします。</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div><h4 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fas fa-trophy text-yellow-500 mr-2"></i>勝因の内訳</h4><div class="chart-container h-80"><canvas id="winReasonChart"></canvas></div></div>
+                        <div><h4 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fas fa-heart-broken text-red-500 mr-2"></i>敗因の内訳</h4><div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div></div>
                     </div>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4>
-                        <div class="chart-container"><canvas id="winRateImpactChart"></canvas></div>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
-                        <div id="weaknessHeatmap" class="overflow-x-auto"></div>
-                    </div>`;
+                    <div class="mt-8"><h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4><div class="chart-container"><canvas id="winRateImpactChart"></canvas></div></div>
+                    <div class="mt-8"><h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4><div id="weaknessHeatmap" class="overflow-x-auto"></div></div>`;
                 }
             }
+
+            // --- 勝因分析 ---
+            const wins = this.state.filteredData.filter(b => b.result === '勝利');
+            if (this.prepareChartContainer('winReasonChart', 1, wins.length, '勝利データを記録すると勝因分析が表示されます。')) {
+                const winReasonCounts = {};
+                wins.forEach(b => { b.winReasons.forEach(reason => { winReasonCounts[reason] = (winReasonCounts[reason] || 0) + 1; }); });
+                const sortedWinReasons = Object.entries(winReasonCounts).sort((a, b) => b[1] - a[1]);
+                this.createChart('winReasonChart', 'bar', {
+                    labels: sortedWinReasons.map(r => r[0]),
+                    datasets: [{ label: '勝因', data: sortedWinReasons.map(r => r[1]), backgroundColor: '#10b981' }]
+                }, { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } });
+            }
             
-            this.updateLossReasonCharts(losses);
+            // --- 敗因分析 ---
+            const losses = this.state.filteredData.filter(b => b.result === '敗北');
+            if (this.prepareChartContainer('lossDetailChart', 1, losses.length, '敗北データを記録すると敗因分析が表示されます。')) {
+                const lossReasonCounts = {};
+                losses.forEach(b => { b.lossReasons.forEach(reason => { lossReasonCounts[reason] = (lossReasonCounts[reason] || 0) + 1; }); });
+                const sortedLossReasons = Object.entries(lossReasonCounts).sort((a, b) => b[1] - a[1]);
+                this.createChart('lossDetailChart', 'bar', {
+                    labels: sortedLossReasons.map(r => r[0]),
+                    datasets: [{ label: '敗因', data: sortedLossReasons.map(r => r[1]), backgroundColor: '#ef4444' }]
+                }, { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } });
+            }
+
             this.updateWinRateImpactChart();
             this.updateWeaknessHeatmap();
         },
 
-        updateLossReasonCharts(losses) {
-            let mistakeLosses = 0, accidentLosses = 0, otherLosses = 0;
-            const mistakeCounts = {}, accidentCounts = {};
-
-            losses.forEach(b => {
-                let isMistake = b.playingMistake !== 'なし';
-                let isAccident = b.handAccident !== 'なし';
-                
-                if (isMistake) {
-                    mistakeLosses++;
-                    mistakeCounts[b.playingMistake] = (mistakeCounts[b.playingMistake] || 0) + 1;
-                }
-                if (isAccident) {
-                    if (!isMistake) accidentLosses++;
-                    accidentCounts[b.handAccident] = (accidentCounts[b.handAccident] || 0) + 1;
-                }
-                if (!isMistake && !isAccident) {
-                    otherLosses++;
-                }
-            });
-
-            this.createChart('lossCategoryChart', 'doughnut', {
-                labels: ['プレミ', '手札事故', 'その他'],
-                datasets: [{ data: [mistakeLosses, accidentLosses, otherLosses], backgroundColor: ['#ef4444', '#f97316', '#6b7280'] }]
-            }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } });
-
-            const sortedMistakes = Object.entries(mistakeCounts).sort((a,b) => b[1] - a[1]);
-            const sortedAccidents = Object.entries(accidentCounts).sort((a,b) => b[1] - a[1]);
-            
-            this.createChart('lossDetailChart', 'bar', {
-                labels: [...sortedMistakes.map(m => m[0]), ...sortedAccidents.map(a => a[0])],
-                datasets: [{
-                    label: '敗因詳細',
-                    data: [...sortedMistakes.map(m => m[1]), ...sortedAccidents.map(a => a[1])],
-                    backgroundColor: [...sortedMistakes.map(() => '#ef4444'), ...sortedAccidents.map(() => '#f97316')]
-                }]
-            }, { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } });
-        },
-
         updateWinRateImpactChart() {
             const d = this.state.filteredData;
+            if (!this.prepareChartContainer('winRateImpactChart', 1, d.length, '')) return;
             const cleanGames = d.filter(b => b.playingMistake === 'なし' && b.handAccident === 'なし');
             const problemGames = d.filter(b => b.playingMistake !== 'なし' || b.handAccident !== 'なし');
-
             const cleanWinRate = cleanGames.length > 0 ? Math.round(cleanGames.filter(b => b.result === '勝利').length / cleanGames.length * 100) : 0;
             const problemWinRate = problemGames.length > 0 ? Math.round(problemGames.filter(b => b.result === '勝利').length / problemGames.length * 100) : 0;
-
             this.createChart('winRateImpactChart', 'bar', {
                 labels: [`プレミ/事故なし (${cleanGames.length}戦)`, `プレミ/事故あり (${problemGames.length}戦)`],
-                datasets: [{
-                    label: '勝率',
-                    data: [cleanWinRate, problemWinRate],
-                    backgroundColor: ['#10b981', '#f59e0b']
-                }]
+                datasets: [{ label: '勝率', data: [cleanWinRate, problemWinRate], backgroundColor: ['#10b981', '#f59e0b'] }]
             }, { responsive: true, maintainAspectRatio: false, scales: { y: { max: 100, beginAtZero: true } }, plugins: { legend: { display: false } } });
         },
 
         updateWeaknessHeatmap() {
-            const { classes, mistakeTypes, accidentTypes } = this.state;
-            const allWeaknesses = [...mistakeTypes, ...accidentTypes];
-            const heatmapData = {};
-            allWeaknesses.forEach(w => {
-                heatmapData[w] = {};
-                classes.forEach(c => heatmapData[w][c] = 0);
-            });
-
-            this.state.filteredData.forEach(b => {
-                if (b.playingMistake !== 'なし') {
-                    heatmapData[b.playingMistake][b.opponentClass]++;
-                }
-                if (b.handAccident !== 'なし') {
-                    heatmapData[b.handAccident][b.opponentClass]++;
-                }
-            });
-
             const container = document.getElementById('weaknessHeatmap');
-            let html = '<div class="heatmap-table">';
-            html += '<div class="heatmap-header"></div>';
+            if(!container) return;
+            const { classes, mistakeTypes, accidentTypes } = this.state, allWeaknesses = [...mistakeTypes, ...accidentTypes], heatmapData = {};
+            allWeaknesses.forEach(w => { heatmapData[w] = {}; classes.forEach(c => heatmapData[w][c] = 0); });
+            this.state.filteredData.forEach(b => {
+                if (b.playingMistake !== 'なし') heatmapData[b.playingMistake][b.opponentClass]++;
+                if (b.handAccident !== 'なし') heatmapData[b.handAccident][b.opponentClass]++;
+            });
+            let html = '<div class="heatmap-table"><div class="heatmap-header"></div>';
             classes.forEach(c => html += `<div class="heatmap-header">${c}</div>`);
-            
             allWeaknesses.forEach(w => {
                 html += `<div class="heatmap-header self-center">${w}</div>`;
                 classes.forEach(c => {
-                    const count = heatmapData[w][c];
-                    const alpha = count > 0 ? Math.min(1, 0.2 + count / 5) : 0;
+                    const count = heatmapData[w][c], alpha = count > 0 ? Math.min(1, 0.2 + count / 5) : 0;
                     const bgColor = alpha > 0 ? `rgba(239, 68, 68, ${alpha})` : '#f3f4f6';
                     html += `<div class="heatmap-cell" style="background-color: ${bgColor}; color: ${alpha > 0.5 ? 'white' : 'black'}">${count > 0 ? count : '-'}</div>`;
                 });
             });
-
-            html += '</div>';
-            container.innerHTML = html;
+            container.innerHTML = html + '</div>';
         },
 
         deleteBattle(id) {if(confirm('この戦績を削除しますか？')){this.state.battleData=this.state.battleData.filter(b=>b.id!==id);localStorage.setItem('shadowverseBattleData',JSON.stringify(this.state.battleData));this.updateAllAnalysis();this.showNotification('戦績を削除しました','success');}},
