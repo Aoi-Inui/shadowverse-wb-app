@@ -332,7 +332,6 @@
                             </select>
                         </div>
                         
-                        <!-- ★★★ NEW FEATURE ★★★ デッキコード入力欄 -->
                         <div>
                             <label for="deckCode" class="block text-sm font-medium text-gray-700 mb-2">
                                 デッキコード/URL (任意)
@@ -556,14 +555,11 @@
                 </div>
                 <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">連勝・連敗分析</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4"><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連勝</p><p class="text-2xl font-bold text-green-600" id="maxWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">最大連敗</p><p class="text-2xl font-bold text-red-600" id="maxLoseStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連勝長</p><p class="text-2xl font-bold text-blue-600" id="avgWinStreak">0</p></div><div class="confidence-interval card p-4"><p class="text-sm text-gray-600">平均連敗長</p><p class="text-2xl font-bold text-orange-600" id="avgLoseStreak">0</p></div></div><div class="chart-container"><canvas id="streakChart"></canvas></div></div>
 
-                <!-- NEW SECTION: Playing/Mistake Analysis -->
                 <div id="playing-analysis-section" class="card p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-2">
                         <i class="fas fa-search-plus text-pink-500 mr-2"></i>プレイング・事故分析
                     </h3>
                     <p class="text-gray-600 mb-6">あなたのプレイ傾向を分析し、改善点を浮き彫りにします。</p>
-
-                    <!-- Plan 1: Loss Reason Charts -->
                     <div class="mb-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">敗因の内訳</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -571,14 +567,10 @@
                             <div class="chart-container h-80"><canvas id="lossDetailChart"></canvas></div>
                         </div>
                     </div>
-
-                    <!-- Plan 2: Win Rate Impact Chart -->
                     <div class="mb-8">
                         <h4 class="text-lg font-bold text-gray-800 mb-4">プレミ/事故の勝率への影響</h4>
                         <div class="chart-container"><canvas id="winRateImpactChart"></canvas></div>
                     </div>
-
-                    <!-- Plan 3: Weakness Heatmap -->
                     <div>
                         <h4 class="text-lg font-bold text-gray-800 mb-4">対クラス別 弱点ヒートマップ</h4>
                         <div id="weaknessHeatmap" class="overflow-x-auto"></div>
@@ -599,29 +591,23 @@
                 <div class="card p-6 mb-6"><h3 class="text-lg font-bold text-gray-800 mb-4">先攻後攻詳細分析</h3><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="chart-container"><canvas id="firstSecondDetailChart"></canvas></div><div class="space-y-4"><div class="advanced-stats-card card p-4"><h4 class="font-bold mb-2">先攻後攻統計</h4><div id="firstSecondDetailStats" class="space-y-2"></div></div></div></div></div>
             </section>
 
-            <!-- Deck Progress Tab -->
+            <!-- ★★★ UPGRADED SECTION ★★★ Deck Progress Tab -->
             <section id="deck-progress" class="tab-content">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">デッキ別成長分析</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">クラス別勝率</h3><div class="chart-container"><canvas id="classWinRateChart"></canvas></div></div>
-                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">使用クラス分布</h3><div class="chart-container"><canvas id="classDistributionChart"></canvas></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">デッキ別勝率</h3><div class="chart-container"><canvas id="deckWinRateChart"></canvas></div></div>
+                    <div class="card p-6"><h3 class="text-lg font-bold text-gray-800 mb-4">使用デッキ分布</h3><div class="chart-container"><canvas id="deckDistributionChart"></canvas></div></div>
                 </div>
-                <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">クラス別詳細統計</h3><div id="classDetailedStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+                <div class="card p-6 mt-6"><h3 class="text-lg font-bold text-gray-800 mb-4">デッキ別詳細統計</h3><div id="deckDetailedStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
                 <div class="card p-6 mt-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">クラス別成長推移</h3>
-                    <div class="mb-4"><label for="classProgressSelector" class="block text-sm font-medium text-gray-700 mb-2">表示するクラス</label>
-                        <select id="classProgressSelector" class="input-field p-3">
-                            <option value="all">全クラス</option>
-                            <option value="ロイヤル">ロイヤル</option>
-                            <option value="ウィッチ">ウィッチ</option>
-                            <option value="ドラゴン">ドラゴン</option>
-                            <option value="ナイトメア">ナイトメア</option>
-                            <option value="ビショップ">ビショップ</option>
-                            <option value="エルフ">エルフ</option>
-                            <option value="ネメシス">ネメシス</option>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">デッキ別成長推移</h3>
+                    <div class="mb-4">
+                        <label for="deckProgressSelector" class="block text-sm font-medium text-gray-700 mb-2">表示するデッキ</label>
+                        <select id="deckProgressSelector" class="input-field p-3">
+                            <!-- Options will be dynamically generated by JavaScript -->
                         </select>
                     </div>
-                    <div class="large-chart-container"><canvas id="classProgressChart"></canvas></div>
+                    <div class="large-chart-container"><canvas id="deckProgressChart"></canvas></div>
                 </div>
             </section>
 
@@ -650,7 +636,7 @@
             currentPeriod: 'all',
             filteredData: [],
             classes: ['ロイヤル', 'ウィッチ', 'ドラゴン', 'ナイトメア', 'ビショップ', 'エルフ', 'ネメシス'],
-            classColors: ['#ff9a9e', '#fecfef', '#4facfe', '#00f2fe', '#667eea', '#764ba2', '#f093fb', '#f5576c'],
+            classColors: ['#ff9a9e', '#fecfef', '#4facfe', '#00f2fe', '#667eea', '#764ba2', '#f093fb', '#f5576c', '#8BC34A', '#FFC107', '#795548', '#607D8B'],
             mistakeTypes: ['序盤判断ミス', '中盤判断ミス', '終盤判断ミス', '進化タイミングミス', 'リーサル見落とし'],
             accidentTypes: ['PP事故', 'フィニッシャー事故', 'マリガン事故', 'ドロー事故']
         },
@@ -670,7 +656,8 @@
             document.getElementById('battleForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
             document.querySelector('nav').addEventListener('click', (e) => this.handleTabClick(e));
             document.querySelector('.period-selector').addEventListener('click', (e) => this.handlePeriodClick(e));
-            document.getElementById('classProgressSelector').addEventListener('change', () => this.updateClassProgressChart());
+            // ★★★ UPGRADED ★★★ Event listener for the new deck selector
+            document.getElementById('deckProgressSelector').addEventListener('change', () => this.updateDeckProgressChart());
             document.getElementById('result').addEventListener('change', (e) => this.toggleReasonCheckboxes(e.target.value));
 
             document.body.addEventListener('click', (e) => {
@@ -735,8 +722,7 @@
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
                 myClass: document.getElementById('myClass').value,
-                // ★★★ NEW FEATURE ★★★ デッキコードを保存
-                deckCode: document.getElementById('deckCode').value,
+                deckCode: document.getElementById('deckCode').value.trim(),
                 opponentClass: document.getElementById('opponentClass').value,
                 result: document.getElementById('result').value,
                 firstSecond: document.getElementById('firstSecond').value,
@@ -772,7 +758,8 @@
                     case 'statistics': this.updateStatistics(); break;
                     case 'advanced-analysis': this.updateAdvancedAnalysis(); break;
                     case 'matchup-analysis': this.updateMatchupAnalysis(); break;
-                    case 'deck-progress': this.updateDeckProgress(); break;
+                    // ★★★ UPGRADED ★★★ Call the new deck analysis function
+                    case 'deck-progress': this.updateDeckAnalysis(); break;
                     case 'data': this.updateDataManagement(); break;
                 }
             }, 10);
@@ -840,6 +827,7 @@
         loadLastSelectedClass() { localStorage.getItem('lastSelectedClass') && (document.getElementById('myClass').value = localStorage.getItem('lastSelectedClass')); },
         saveLastSelectedClass(className) { localStorage.setItem('lastSelectedClass', className); },
         getCheckedValues(prefix) { return Array.from(document.querySelectorAll(`input[id^="${prefix}"]:checked`)).map(cb => cb.value); },
+        getDeckKey(battle) { return (battle.deckCode && battle.deckCode.trim() !== '') ? battle.deckCode.trim() : '(デッキ未登録)'; },
         
         createChart(canvasId, type, data, options) {
             const ctx = document.getElementById(canvasId);
@@ -851,12 +839,10 @@
         prepareChartContainer(canvasId, requiredLength, actualLength, message) {
             const container = document.getElementById(canvasId)?.parentElement;
             if (!container) return false;
-
             if (actualLength < requiredLength) {
                 container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-500 p-4 text-center">${message}</div>`;
                 return false;
             }
-
             if (!container.querySelector('canvas')) {
                 container.innerHTML = `<canvas id="${canvasId}"></canvas>`;
             }
@@ -935,7 +921,6 @@
         
         updateDataManagement() {
             const html = this.state.battleData.slice().reverse().map(b => {
-                // ★★★ NEW FEATURE ★★★ デッキリンクを生成
                 let deckLinkHTML = '';
                 if (b.deckCode && b.deckCode.trim() !== '') {
                     const isUrl = b.deckCode.startsWith('http');
@@ -946,7 +931,6 @@
                         </a>
                     `;
                 }
-
                 return `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center">
@@ -1023,36 +1007,136 @@
             const c=this.state.classes,fs={},ss={};c.forEach(cn=>{const f=d.filter(b=>b.myClass===cn&&b.firstSecond==='先攻'),s=d.filter(b=>b.myClass===cn&&b.firstSecond==='後攻');fs[cn]=f.length>0?Math.round(f.filter(b=>b.result==='勝利').length/f.length*100):0;ss[cn]=s.length>0?Math.round(s.filter(b=>b.result==='勝利').length/s.length*100):0;});this.createChart('firstSecondDetailChart','bar',{labels:c,datasets:[{label:'先攻勝率',data:c.map(cn=>fs[cn]),backgroundColor:'#4facfe'},{label:'後攻勝率',data:c.map(cn=>ss[cn]),backgroundColor:'#ff9a9e'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});this.updateFirstSecondDetailStats();
         },
         updateFirstSecondDetailStats(){const d=this.state.filteredData,f=d.filter(b=>b.firstSecond==='先攻'),s=d.filter(b=>b.firstSecond==='後攻'),fw=f.filter(b=>b.result==='勝利').length,sw=s.filter(b=>b.result==='勝利').length,fci=this.calculateConfidenceInterval(fw,f.length),sci=this.calculateConfidenceInterval(sw,s.length),sig=this.calculateFirstSecondSignificance(fw,f.length,sw,s.length);document.getElementById('firstSecondDetailStats').innerHTML=`<div class="space-y-3"><div class="flex justify-between"><span>先攻勝率:</span><span class="font-bold text-blue-600">${f.length>0?Math.round(fw/f.length*100):0}% (${fw}/${f.length})</span></div><div class="flex justify-between"><span>後攻勝率:</span><span class="font-bold text-red-600">${s.length>0?Math.round(sw/s.length*100):0}% (${sw}/${s.length})</span></div><div class="flex justify-between"><span>先攻信頼区間:</span><span class="text-sm text-gray-600">${Math.round(fci.lower*100)}%-${Math.round(fci.upper*100)}%</span></div><div class="flex justify-between"><span>後攻信頼区間:</span><span class="text-sm text-gray-600">${Math.round(sci.lower*100)}%-${Math.round(sci.upper*100)}%</span></div><div class="flex justify-between"><span>差の有意性:</span><span class="significance-indicator ${sig.significant?'significant':'not-significant'}">${sig.significant?'有意差あり':'有意差なし'}</span></div></div>`;},
-        updateClassWinRateChart(){
-            const d=this.state.filteredData;
-            if (!this.prepareChartContainer('classWinRateChart', 1, d.length, '戦績を記録するとクラス別勝率が表示されます。')) return;
-            const cs={};d.forEach(b=>{if(!cs[b.myClass])cs[b.myClass]={w:0,t:0};cs[b.myClass].t++;if(b.result==='勝利')cs[b.myClass].w++;});const l=Object.keys(cs);this.createChart('classWinRateChart','bar',{labels:l,datasets:[{label:'勝率',data:l.map(n=>cs[n].t>0?Math.round(cs[n].w/cs[n].t*100):0),backgroundColor:this.state.classColors}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});
+        
+        // ★★★ UPGRADED DECK ANALYSIS FUNCTIONS ★★★
+        updateDeckAnalysis() {
+            this.updateDeckSelector();
+            this.updateDeckWinRateChart();
+            this.updateDeckDistributionChart();
+            this.updateDeckDetailedStats();
+            this.updateDeckProgressChart();
         },
-        updateClassDistributionChart(){
-            const d=this.state.filteredData;
-            if (!this.prepareChartContainer('classDistributionChart', 1, d.length, '戦績を記録すると使用クラス分布が表示されます。')) return;
-            const c={};d.forEach(b=>c[b.myClass]=(c[b.myClass]||0)+1);this.createChart('classDistributionChart','doughnut',{labels:Object.keys(c),datasets:[{data:Object.values(c),backgroundColor:this.state.classColors}]},{responsive:true,maintainAspectRatio:false});
-        },
-        updateClassDetailedStats(){const d=this.state.filteredData,cs={};d.forEach(b=>{if(!cs[b.myClass])cs[b.myClass]={w:0,t:0};cs[b.myClass].t++;if(b.result==='勝利')cs[b.myClass].w++;});document.getElementById('classDetailedStats').innerHTML=Object.entries(cs).map(([n,s])=>{const ci=this.calculateConfidenceInterval(s.w,s.t);return`<div class="stats-card card p-4"><h4 class="font-bold text-lg mb-2">${n}</h4><div class="space-y-2"><div class="flex justify-between"><span>戦績:</span><span class="font-bold">${s.w}勝${s.t-s.w}敗</span></div><div class="flex justify-between"><span>勝率:</span><span class="font-bold text-green-600">${s.t>0?Math.round(s.w/s.t*100):0}%</span></div><div class="flex justify-between"><span>信頼区間:</span><span class="text-xs text-gray-600">${Math.round(ci.lower*100)}%-${Math.round(ci.upper*100)}%</span></div></div></div>`;}).join('');},
-        updateClassProgressChart(){
-            const sc=document.getElementById('classProgressSelector').value;
-            const d = this.state.filteredData.filter(b => sc === 'all' || b.myClass === sc);
-            const required = 5;
-            if (!this.prepareChartContainer('classProgressChart', required, d.length, `選択したクラスで${required}戦以上記録すると、成長推移が表示されます。`)) return;
 
-            if(sc==='all')this.updateAllClassProgress();else this.updateSingleClassProgress(sc);
+        updateDeckSelector() {
+            const selector = document.getElementById('deckProgressSelector');
+            const uniqueDeckKeys = [...new Set(this.state.filteredData.map(b => this.getDeckKey(b)))];
+            
+            // Preserve current selection if it still exists
+            const currentSelection = selector.value;
+            selector.innerHTML = ''; // Clear existing options
+
+            if (uniqueDeckKeys.length === 0) {
+                selector.innerHTML = '<option value="">デッキデータがありません</option>';
+                return;
+            }
+
+            uniqueDeckKeys.sort().forEach(deckKey => {
+                const option = document.createElement('option');
+                option.value = deckKey;
+                option.textContent = deckKey;
+                selector.appendChild(option);
+            });
+
+            // Restore selection
+            if (uniqueDeckKeys.includes(currentSelection)) {
+                selector.value = currentSelection;
+            }
         },
-        updateAllClassProgress(){const d=this.state.filteredData,c=this.state.classes,ds=c.map((cn,i)=>{const cd=d.filter(b=>b.myClass===cn);if(cd.length<5)return null;const r=[];for(let j=5;j<=cd.length;j+=5)r.push(Math.round(cd.slice(0,j).filter(b=>b.result==='勝利').length/j*100));return{label:cn,data:r,borderColor:this.state.classColors[i],tension:0.4};}).filter(d=>d);this.createChart('classProgressChart','line',{labels:ds.length > 0 ? ds[0]?.data.map((_,i)=>`${(i+1)*5}戦`)||[] : [],datasets:ds},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
-        updateSingleClassProgress(cn){const cd=this.state.filteredData.filter(b=>b.myClass===cn);if(cd.length===0)return;const l=[],r=[],cu=[],cl=[];for(let i=1;i<=cd.length;i++){const w=cd.slice(0,i),wn=w.filter(b=>b.result==='勝利').length,ci=this.calculateConfidenceInterval(wn,i);l.push(`${i}戦目`);r.push(wn/i*100);cu.push(ci.upper*100);cl.push(ci.lower*100);}this.createChart('classProgressChart','line',{labels:l,datasets:[{label:'勝率',data:r,borderColor:'#ff9a9e'},{label:'信頼区間',data:cu,borderColor:'#ff9a9e80',borderDash:[5,5],fill:false},{data:cl,borderColor:'#ff9a9e80',borderDash:[5,5],fill:'-1'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
+
+        updateDeckWinRateChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('deckWinRateChart', 1, d.length, '戦績を記録するとデッキ別勝率が表示されます。')) return;
+            const deckStats={};
+            d.forEach(b=>{
+                const key = this.getDeckKey(b);
+                if(!deckStats[key]) deckStats[key]={w:0,t:0};
+                deckStats[key].t++;
+                if(b.result==='勝利') deckStats[key].w++;
+            });
+            const labels = Object.keys(deckStats);
+            const data = labels.map(key => deckStats[key].t > 0 ? Math.round(deckStats[key].w / deckStats[key].t * 100) : 0);
+            const bgColors = labels.map((_, i) => this.state.classColors[i % this.state.classColors.length]);
+            this.createChart('deckWinRateChart','bar',{labels, datasets:[{label:'勝率',data,backgroundColor:bgColors}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});
+        },
+
+        updateDeckDistributionChart(){
+            const d=this.state.filteredData;
+            if (!this.prepareChartContainer('deckDistributionChart', 1, d.length, '戦績を記録すると使用デッキ分布が表示されます。')) return;
+            const deckCounts={};
+            d.forEach(b => {
+                const key = this.getDeckKey(b);
+                deckCounts[key] = (deckCounts[key] || 0) + 1;
+            });
+            const labels = Object.keys(deckCounts);
+            const data = Object.values(deckCounts);
+            const bgColors = labels.map((_, i) => this.state.classColors[i % this.state.classColors.length]);
+            this.createChart('deckDistributionChart','doughnut',{labels, datasets:[{data,backgroundColor:bgColors}]},{responsive:true,maintainAspectRatio:false});
+        },
+
+        updateDeckDetailedStats(){
+            const d=this.state.filteredData;
+            const deckStats={};
+            d.forEach(b=>{
+                const key = this.getDeckKey(b);
+                if(!deckStats[key]) deckStats[key]={w:0,t:0};
+                deckStats[key].t++;
+                if(b.result==='勝利') deckStats[key].w++;
+            });
+            
+            const html = Object.entries(deckStats).map(([key, stats])=>{
+                const ci = this.calculateConfidenceInterval(stats.w, stats.t);
+                return`<div class="stats-card card p-4">
+                    <h4 class="font-bold text-lg mb-2 truncate" title="${key}">${key}</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between"><span>戦績:</span><span class="font-bold">${stats.w}勝${stats.t-stats.w}敗</span></div>
+                        <div class="flex justify-between"><span>勝率:</span><span class="font-bold text-green-600">${stats.t>0?Math.round(stats.w/stats.t*100):0}%</span></div>
+                        <div class="flex justify-between"><span>信頼区間:</span><span class="text-xs text-gray-600">${Math.round(ci.lower*100)}%-${Math.round(ci.upper*100)}%</span></div>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('deckDetailedStats').innerHTML = html || '<p class="text-gray-500 text-center">デッキデータがありません</p>';
+        },
+
+        updateDeckProgressChart(){
+            const selectedDeck = document.getElementById('deckProgressSelector').value;
+            if (!selectedDeck) {
+                 this.prepareChartContainer('deckProgressChart', 1, 0, '分析するデッキを選択してください。');
+                 return;
+            }
+            
+            const deckData = this.state.filteredData.filter(b => this.getDeckKey(b) === selectedDeck);
+            const required = 5;
+            if (!this.prepareChartContainer('deckProgressChart', required, deckData.length, `選択したデッキで${required}戦以上記録すると、成長推移が表示されます。`)) return;
+
+            const labels=[], winRates=[], ciUpper=[], ciLower=[];
+            for(let i=1; i<=deckData.length; i++){
+                const filtered = deckData.slice(0,i);
+                const wins = filtered.filter(b => b.result === '勝利').length;
+                const ci = this.calculateConfidenceInterval(wins, i);
+                labels.push(`${i}戦目`);
+                winRates.push(wins/i*100);
+                ciUpper.push(ci.upper*100);
+                ciLower.push(ci.lower*100);
+            }
+            this.createChart('deckProgressChart','line',{
+                labels,
+                datasets:[
+                    {label:'勝率',data:winRates,borderColor:'#ff9a9e', tension:0.1},
+                    {label:'信頼区間(上)',data:ciUpper,borderColor:'rgba(255, 154, 158, 0.3)',borderDash:[5,5],fill:false, pointRadius: 0},
+                    {label:'信頼区間(下)',data:ciLower,borderColor:'rgba(255, 154, 158, 0.3)',borderDash:[5,5],fill:'-1', backgroundColor: 'rgba(255, 154, 158, 0.1)', pointRadius: 0}
+                ]
+            },{responsive:true,maintainAspectRatio:false,scales:{y:{max:100, min: 0}}});
+        },
+
 
         updatePlayingAnalysis() {
             const losses = this.state.filteredData.filter(b => b.result === '敗北');
             const requiredLosses = 5;
+            const section = document.getElementById('playing-analysis-section');
             if (losses.length < requiredLosses) {
-                document.getElementById('playing-analysis-section').innerHTML = `<div class="text-center text-gray-500 p-8">敗北データを${requiredLosses}件以上記録すると、プレイング・事故分析が表示されます。</div>`;
+                section.innerHTML = `<div class="text-center text-gray-500 p-8">敗北データを${requiredLosses}件以上記録すると、プレイング・事故分析が表示されます。</div>`;
                 return;
             } else {
-                const section = document.getElementById('playing-analysis-section');
                 if (!section.querySelector('canvas')) {
                     section.innerHTML = `
                     <h3 class="text-xl font-bold text-gray-800 mb-2">
