@@ -232,11 +232,6 @@
             overflow-x: auto;
             min-width: 800px;
         }
-        .heatmap-header {
-            font-weight: bold;
-            padding: 8px;
-            text-align: center;
-        }
     </style>
 </head>
 <body class="min-h-screen p-4">
@@ -337,6 +332,17 @@
                             </select>
                         </div>
                         
+                        <!-- ★★★ NEW FEATURE ★★★ デッキコード入力欄 -->
+                        <div>
+                            <label for="deckCode" class="block text-sm font-medium text-gray-700 mb-2">
+                                デッキコード/URL (任意)
+                                <span class="tooltip" data-tooltip="シャドウバースポータルのデッキURLやデッキコードを入力すると、後から構築を確認できます。">
+                                    <i class="fas fa-info-circle text-blue-500 ml-1"></i>
+                                </span>
+                            </label>
+                            <input type="text" id="deckCode" class="input-field w-full p-3" placeholder="例: https://shadowverse-portal.com/... または 4f3a">
+                        </div>
+
                         <div>
                             <label for="opponentClass" class="block text-sm font-medium text-gray-700 mb-2">相手のクラス</label>
                             <select id="opponentClass" class="input-field w-full p-3" required>
@@ -645,7 +651,6 @@
             filteredData: [],
             classes: ['ロイヤル', 'ウィッチ', 'ドラゴン', 'ナイトメア', 'ビショップ', 'エルフ', 'ネメシス'],
             classColors: ['#ff9a9e', '#fecfef', '#4facfe', '#00f2fe', '#667eea', '#764ba2', '#f093fb', '#f5576c'],
-            // Define mistake and accident types for analysis
             mistakeTypes: ['序盤判断ミス', '中盤判断ミス', '終盤判断ミス', '進化タイミングミス', 'リーサル見落とし'],
             accidentTypes: ['PP事故', 'フィニッシャー事故', 'マリガン事故', 'ドロー事故']
         },
@@ -730,6 +735,8 @@
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
                 myClass: document.getElementById('myClass').value,
+                // ★★★ NEW FEATURE ★★★ デッキコードを保存
+                deckCode: document.getElementById('deckCode').value,
                 opponentClass: document.getElementById('opponentClass').value,
                 result: document.getElementById('result').value,
                 firstSecond: document.getElementById('firstSecond').value,
@@ -747,7 +754,7 @@
             localStorage.setItem('shadowverseBattleData', JSON.stringify(this.state.battleData));
             this.saveLastSelectedClass(battleRecord.myClass);
             form.reset();
-            this.toggleReasonCheckboxes(''); // Reset checkboxes state
+            this.toggleReasonCheckboxes('');
             this.showNotification('戦績を保存しました！', 'success');
             this.filterDataByPeriod();
             this.updateAllAnalysis();
@@ -921,13 +928,43 @@
             this.updateMovingAverageChart(); 
             this.updateWinRateDistributionChart(); 
             this.updateStreakAnalysis();
-            this.updatePlayingAnalysis(); // NEW: Call playing analysis update
+            this.updatePlayingAnalysis();
         },
 
         updateMatchupAnalysis() { this.updateMatchupHeatmap(); this.updateDetailedMatchupStats(); this.updateOpponentRankChart(); this.updateOpponentGroupChart(); this.updateFirstSecondDetailChart(); },
-        updateDeckProgress() { this.updateClassWinRateChart(); this.updateClassDistributionChart(); this.updateClassDetailedStats(); this.updateClassProgressChart(); },
+        
         updateDataManagement() {
-            const html = this.state.battleData.slice().reverse().map(b => `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}"><div class="flex justify-between items-start mb-2"><div class="flex items-center space-x-4"><span class="font-bold ${b.result==='勝利'?'text-green-600':'text-red-600'}">${b.result}</span><span class="text-sm text-gray-600">${new Date(b.timestamp).toLocaleString('ja-JP')}</span></div><button data-action="delete-battle" data-id="${b.id}" class="text-red-500 no-print"><i class="fas fa-trash"></i></button></div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm"><div><strong>自分:</strong> ${b.myClass}</div><div><strong>相手:</strong> ${b.opponentClass}</div><div><strong>先攻後攻:</strong> ${b.firstSecond}</div><div><strong>時間帯:</strong> ${b.timeSlot}</div></div>${b.memo?`<div class="mt-2 text-sm text-gray-600"><strong>メモ:</strong> ${b.memo}</div>`:''}</div>`).join('');
+            const html = this.state.battleData.slice().reverse().map(b => {
+                // ★★★ NEW FEATURE ★★★ デッキリンクを生成
+                let deckLinkHTML = '';
+                if (b.deckCode && b.deckCode.trim() !== '') {
+                    const isUrl = b.deckCode.startsWith('http');
+                    const linkHref = isUrl ? b.deckCode : `https://shadowverse-portal.com/deck_co/deck.html?deck_code=${b.deckCode}`;
+                    deckLinkHTML = `
+                        <a href="${linkHref}" target="_blank" rel="noopener noreferrer" class="btn-secondary text-xs px-3 py-1 no-print ml-4">
+                            <i class="fas fa-clone mr-1"></i> デッキ確認
+                        </a>
+                    `;
+                }
+
+                return `<div class="battle-record ${b.result==='勝利'?'win-record':'lose-record'}">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center">
+                            <span class="font-bold ${b.result==='勝利'?'text-green-600':'text-red-600'}">${b.result}</span>
+                            <span class="text-sm text-gray-600 ml-4">${new Date(b.timestamp).toLocaleString('ja-JP')}</span>
+                            ${deckLinkHTML}
+                        </div>
+                        <button data-action="delete-battle" data-id="${b.id}" class="text-red-500 no-print"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                        <div><strong>自分:</strong> ${b.myClass}</div>
+                        <div><strong>相手:</strong> ${b.opponentClass}</div>
+                        <div><strong>先攻後攻:</strong> ${b.firstSecond}</div>
+                        <div><strong>時間帯:</strong> ${b.timeSlot}</div>
+                    </div>
+                    ${b.memo?`<div class="mt-2 text-sm text-gray-600"><strong>メモ:</strong> ${b.memo}</div>`:''}
+                </div>`;
+            }).join('');
             document.getElementById('battleRecords').innerHTML = html || '<p class="text-gray-500 text-center">戦績データがありません</p>';
         },
 
@@ -1008,7 +1045,6 @@
         updateAllClassProgress(){const d=this.state.filteredData,c=this.state.classes,ds=c.map((cn,i)=>{const cd=d.filter(b=>b.myClass===cn);if(cd.length<5)return null;const r=[];for(let j=5;j<=cd.length;j+=5)r.push(Math.round(cd.slice(0,j).filter(b=>b.result==='勝利').length/j*100));return{label:cn,data:r,borderColor:this.state.classColors[i],tension:0.4};}).filter(d=>d);this.createChart('classProgressChart','line',{labels:ds.length > 0 ? ds[0]?.data.map((_,i)=>`${(i+1)*5}戦`)||[] : [],datasets:ds},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
         updateSingleClassProgress(cn){const cd=this.state.filteredData.filter(b=>b.myClass===cn);if(cd.length===0)return;const l=[],r=[],cu=[],cl=[];for(let i=1;i<=cd.length;i++){const w=cd.slice(0,i),wn=w.filter(b=>b.result==='勝利').length,ci=this.calculateConfidenceInterval(wn,i);l.push(`${i}戦目`);r.push(wn/i*100);cu.push(ci.upper*100);cl.push(ci.lower*100);}this.createChart('classProgressChart','line',{labels:l,datasets:[{label:'勝率',data:r,borderColor:'#ff9a9e'},{label:'信頼区間',data:cu,borderColor:'#ff9a9e80',borderDash:[5,5],fill:false},{data:cl,borderColor:'#ff9a9e80',borderDash:[5,5],fill:'-1'}]},{responsive:true,maintainAspectRatio:false,scales:{y:{max:100}}});},
 
-        // ** NEW **: Playing/Mistake Analysis functions
         updatePlayingAnalysis() {
             const losses = this.state.filteredData.filter(b => b.result === '敗北');
             const requiredLosses = 5;
@@ -1016,7 +1052,6 @@
                 document.getElementById('playing-analysis-section').innerHTML = `<div class="text-center text-gray-500 p-8">敗北データを${requiredLosses}件以上記録すると、プレイング・事故分析が表示されます。</div>`;
                 return;
             } else {
-                 // Restore the section content if it was replaced by the message
                 const section = document.getElementById('playing-analysis-section');
                 if (!section.querySelector('canvas')) {
                     section.innerHTML = `
@@ -1060,7 +1095,6 @@
                     mistakeCounts[b.playingMistake] = (mistakeCounts[b.playingMistake] || 0) + 1;
                 }
                 if (isAccident) {
-                    // Avoid double counting if a loss has both
                     if (!isMistake) accidentLosses++;
                     accidentCounts[b.handAccident] = (accidentCounts[b.handAccident] || 0) + 1;
                 }
@@ -1069,13 +1103,11 @@
                 }
             });
 
-            // Plan 1-1: Loss Category Chart
             this.createChart('lossCategoryChart', 'doughnut', {
                 labels: ['プレミ', '手札事故', 'その他'],
                 datasets: [{ data: [mistakeLosses, accidentLosses, otherLosses], backgroundColor: ['#ef4444', '#f97316', '#6b7280'] }]
             }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } });
 
-            // Plan 1-2: Loss Detail Chart
             const sortedMistakes = Object.entries(mistakeCounts).sort((a,b) => b[1] - a[1]);
             const sortedAccidents = Object.entries(accidentCounts).sort((a,b) => b[1] - a[1]);
             
@@ -1127,11 +1159,9 @@
 
             const container = document.getElementById('weaknessHeatmap');
             let html = '<div class="heatmap-table">';
-            // Header
             html += '<div class="heatmap-header"></div>';
             classes.forEach(c => html += `<div class="heatmap-header">${c}</div>`);
             
-            // Rows
             allWeaknesses.forEach(w => {
                 html += `<div class="heatmap-header self-center">${w}</div>`;
                 classes.forEach(c => {
@@ -1149,7 +1179,7 @@
 
         deleteBattle(id) {if(confirm('この戦績を削除しますか？')){this.state.battleData=this.state.battleData.filter(b=>b.id!==id);localStorage.setItem('shadowverseBattleData',JSON.stringify(this.state.battleData));this.updateAllAnalysis();this.showNotification('戦績を削除しました','success');}},
         exportData() {const s=JSON.stringify(this.state.battleData,null,2),b=new Blob([s],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`sdb_data_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(u);this.showNotification('データをエクスポートしました','success');},
-        exportAdvancedReport(){/* This function is complex and can be added later if needed */ this.showNotification('この機能は現在準備中です', 'info');},
+        exportAdvancedReport(){this.showNotification('この機能は現在準備中です', 'info');},
         importData() {const f=document.getElementById('importFile').files[0];if(!f)return this.showNotification('ファイルを選択してください','error');const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(Array.isArray(d)){this.state.battleData=d;localStorage.setItem('shadowverseBattleData',JSON.stringify(d));this.updateAllAnalysis();this.showNotification('データをインポートしました','success');}else throw new Error();}catch{this.showNotification('無効なデータ形式です','error');}};r.readAsText(f);},
         clearAllData() {if(confirm('全てのデータを削除しますか？')){this.state.battleData=[];localStorage.removeItem('shadowverseBattleData');this.updateAllAnalysis();this.showNotification('全データを削除しました','success');}},
         showNotification(m,t){const e=document.createElement('div');e.className=`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${t==='success'?'bg-green-500':(t==='error'?'bg-red-500':'bg-blue-500')} text-white fade-in`;e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3000);}
